@@ -60,14 +60,26 @@ herramientas = {
 
 usuarios_estado = {}
 
+RESPUESTAS_SI = ["sí", "si", "sí.", "si.", "claro", "exacto", "eso"]
+RESPUESTAS_NO = ["no", "no.", "nop", "negativo"]
+
+SALUDOS_INICIALES = ["hola", "buenas", "buenos días", "buenas tardes", "buenas noches"]
+
+
 def procesar_mensaje(mensaje, user_id):
+    texto_normalizado = mensaje.strip().lower()
     estado = usuarios_estado.get(user_id, {})
+
+    if any(saludo in texto_normalizado for saludo in SALUDOS_INICIALES) and "fase" not in estado:
+        estado["fase"] = "esperando_descripcion"
+        usuarios_estado[user_id] = estado
+        return "Hola. Estoy aquí para ayudarte a desarrollar las habilidades que necesitás para afrontar los desafíos de la vida. Contame, ¿qué te está pasando?"
 
     if "fase" not in estado:
         estado["fase"] = "inicio"
         usuarios_estado[user_id] = estado
 
-    if estado["fase"] == "inicio":
+    if estado["fase"] == "inicio" or estado["fase"] == "esperando_descripcion":
         estado["fase"] = "emocion_detectada"
         estado["mensaje_usuario"] = mensaje
         emocion_detectada = random.choice(list(emociones_habilidades.keys()))
@@ -78,17 +90,24 @@ def procesar_mensaje(mensaje, user_id):
         return f"Gracias por contarme eso. Por lo que decís, podría ser que estés sintiendo *{emocion_detectada}*. ¿Te suena eso? (Responé 'sí' o 'no')"
 
     if estado["fase"] == "emocion_detectada":
-        if mensaje.lower() == "sí":
+        if texto_normalizado in RESPUESTAS_SI:
             habilidad = estado["habilidad"]
             estado["fase"] = "plan_sugerido"
             descripcion = descripcion_habilidades.get(habilidad, "una habilidad clave")
             herramienta = random.choice(herramientas[habilidad])
             usuarios_estado[user_id] = estado
-            return f"Genial. Entonces vamos a trabajar en *{habilidad}*, que es {descripcion}.\n\nTu primer reto es: {herramienta}"
-        else:
+            return f"Genial. Entonces vamos a trabajar en *{habilidad}*, que es {descripcion}.
+
+Tu primer reto es: {herramienta}"
+        elif texto_normalizado in RESPUESTAS_NO:
             estado["fase"] = "reinicio"
             usuarios_estado[user_id] = estado
             return "Ok, vamos a intentar identificar otra emoción. Contame de nuevo qué está pasando."
+        else:
+            return "Perdón, necesito que me confirmes si la emoción que mencioné te suena o no. Escribí 'sí' o 'no'."
+
+    if estado["fase"] == "plan_sugerido":
+        return "Ya comenzamos tu plan. Si querés seguir con otro desafío, contame una nueva situación."
 
     if estado["fase"] == "reinicio":
         estado["fase"] = "inicio"
