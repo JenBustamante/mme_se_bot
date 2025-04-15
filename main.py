@@ -65,10 +65,6 @@ def procesar_mensaje(mensaje, user_id):
             "¿Te gustaría comenzar contándome qué te está preocupando o afectando últimamente?"
         )
 
-    if "fase" not in estado:
-        estado["fase"] = "esperando_descripcion"
-        usuarios_estado[user_id] = estado
-
     if estado["fase"] == "esperando_descripcion":
         estado["mensaje_usuario"] = mensaje
         estado.setdefault("historial", []).append(mensaje)
