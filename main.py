@@ -109,10 +109,9 @@ def procesar_mensaje(mensaje, user_id):
         estado["habilidad"] = habilidad
         usuarios_estado[user_id] = estado
 
-        return (
-            f"Gracias por compartir todo eso conmigo. Por lo que me contás, podría ser que estés sintiendo *{emocion_detectada}*.",
-            f"¿Te hace sentido eso? Si querés, podemos trabajarla desarrollando tu habilidad de *{habilidad}*.\n¿Querés empezar por ahí? (sí/no)"
-        )
+        return f"Gracias por compartir todo eso conmigo. Por lo que me contás, podría ser que estés sintiendo *{emocion_detectada}*.
+¿Te hace sentido eso? Si querés, podemos trabajarla desarrollando tu habilidad de *{habilidad}*.
+¿Querés empezar por ahí? (sí/no)"
 
     if estado["fase"] == "emocion_confirmada":
         if texto in RESPUESTAS_SI:
