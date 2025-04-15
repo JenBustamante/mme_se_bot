@@ -66,8 +66,6 @@ retos_narrativos = {
 }
 
 usuarios_estado = {}
-# seguimiento_usuarios deshabilitado por ahora
-# seguimiento_usuarios = {}
 
 RESPUESTAS_SI = ["sí", "si", "sí.", "si.", "claro", "exacto", "eso"]
 RESPUESTAS_NO = ["no", "no.", "nop", "negativo"]
