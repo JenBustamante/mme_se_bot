@@ -10,7 +10,6 @@ BOT_USERNAME = "@MME_SE_bot"
 app = Flask(__name__)
 bot = telegram.Bot(token=TELEGRAM_TOKEN)
 
-# Diccionario base de emociones y habilidades asociadas
 emociones_habilidades = {
     "ansiedad": "autorregulación",
     "tristeza": "autoconciencia",
@@ -20,7 +19,6 @@ emociones_habilidades = {
     "culpa": "toma de decisiones responsable"
 }
 
-# Descripciones CASEL básicas
 descripcion_habilidades = {
     "autorregulación": "la capacidad de manejar emociones intensas de forma saludable",
     "autoconciencia": "la habilidad de entender lo que sentís y por qué",
@@ -29,32 +27,31 @@ descripcion_habilidades = {
     "confianza": "una valoración sólida de vos misma/o basada en tu valor, no en la aprobación externa"
 }
 
-# Herramientas prácticas por habilidad (TCC + retos)
 herramientas = {
     "autorregulación": [
-        "Hacé una pausa de 5 minutos en silencio antes de responder a algo que te altere",
-        "Probá la técnica del semáforo: Parar, Pensar, Actuar",
-        "Escribí lo que te está irritando y tachá lo que no podés controlar"
+        "Practicá la respiración diafragmática: inhalá 4 segundos, sostené 4, exhalá 6.",
+        "Antes de una situación difícil, hacé una pausa de 1 minuto en silencio.",
+        "Usá la técnica del semáforo: Parar, Pensar, Actuar."
     ],
     "autoconciencia": [
-        "Anotá lo que sentiste hoy y qué situación lo disparó",
-        "Identificá qué pensás de vos misma/o cuando te sentís mal",
-        "Dibujá o escribí cómo se siente tu emoción en el cuerpo"
+        "Anotá qué sentiste hoy y qué lo disparó.",
+        "Hacé una lluvia de pensamientos que te repetís cuando te sentís mal.",
+        "Dibujá o describí en qué parte del cuerpo sentís tu emoción."
     ],
     "toma de decisiones responsable": [
-        "Antes de decidir, escribí dos consecuencias posibles de cada opción",
-        "Preguntate: ¿esto es impulsivo o reflexionado?",
-        "Elegí una situación y buscá el consejo que le darías a otra persona en tu lugar"
+        "Antes de actuar, escribí dos consecuencias posibles de cada decisión.",
+        "Hacé una lista de decisiones pasadas: ¿fueron impulsivas o reflexivas?",
+        "Pensá qué consejo le darías a un amigo en tu misma situación."
     ],
     "conciencia social": [
-        "Observá una conversación y anotá cómo se sintieron los otros",
-        "Hacé una pequeña acción empática hoy (aunque no te la pidan)",
-        "Preguntale a alguien cómo está... y escuchá de verdad"
+        "Observá cómo reaccionan los demás y qué podrían estar sintiendo.",
+        "Hacé una acción amable sin que te la pidan.",
+        "Preguntale a alguien cómo está y escuchá con atención."
     ],
     "confianza": [
-        "Anotá 3 cosas que valorás de vos misma/o que no dependen de nadie más",
-        "Pensá en una vez en la que superaste algo difícil. ¿Qué hiciste bien?",
-        "Elegí una crítica que te hicieron y desmentila con evidencia real"
+        "Listá 3 logros tuyos que no dependen de la aprobación de otros.",
+        "Recordá una situación difícil que superaste. ¿Qué recursos usaste?",
+        "Escribí una crítica que recibiste y refutala con hechos."
     ]
 }
 
@@ -62,57 +59,68 @@ usuarios_estado = {}
 
 RESPUESTAS_SI = ["sí", "si", "sí.", "si.", "claro", "exacto", "eso"]
 RESPUESTAS_NO = ["no", "no.", "nop", "negativo"]
-
 SALUDOS_INICIALES = ["hola", "buenas", "buenos días", "buenas tardes", "buenas noches"]
 
 
 def procesar_mensaje(mensaje, user_id):
-    texto_normalizado = mensaje.strip().lower()
+    texto = mensaje.strip().lower()
     estado = usuarios_estado.get(user_id, {})
 
-    if any(saludo in texto_normalizado for saludo in SALUDOS_INICIALES) and "fase" not in estado:
+    if any(s in texto for s in SALUDOS_INICIALES) and "fase" not in estado:
         estado["fase"] = "esperando_descripcion"
         usuarios_estado[user_id] = estado
-        return "Hola. Estoy aquí para ayudarte a desarrollar las habilidades que necesitás para afrontar los desafíos de la vida. Contame, ¿qué te está pasando?"
+        return "¡Hola! Estoy aquí para ayudarte a desarrollar habilidades que te ayuden a afrontar lo que estás viviendo. Contame, ¿qué te está preocupando en este momento?"
 
     if "fase" not in estado:
-        estado["fase"] = "inicio"
+        estado["fase"] = "esperando_descripcion"
         usuarios_estado[user_id] = estado
 
-    if estado["fase"] == "inicio" or estado["fase"] == "esperando_descripcion":
-        estado["fase"] = "emocion_detectada"
+    if estado["fase"] == "esperando_descripcion":
         estado["mensaje_usuario"] = mensaje
-        emocion_detectada = random.choice(list(emociones_habilidades.keys()))
-        estado["emocion"] = emocion_detectada
+        estado["fase"] = "indagacion_1"
+        usuarios_estado[user_id] = estado
+        return "Gracias por compartirlo. ¿Qué es lo más difícil de esa situación para vos?"
+
+    if estado["fase"] == "indagacion_1":
+        estado["indagacion_1"] = mensaje
+        estado["fase"] = "indagacion_2"
+        usuarios_estado[user_id] = estado
+        return "¿Y en esos momentos, notás alguna sensación física o pensamientos que se repitan?"
+
+    if estado["fase"] == "indagacion_2":
+        estado["indagacion_2"] = mensaje
+        estado["fase"] = "emocion_confirmada"
+        emocion_detectada = "ansiedad" if "trabajo" in estado["mensaje_usuario"] else "tristeza"
         habilidad = emociones_habilidades[emocion_detectada]
+        estado["emocion"] = emocion_detectada
         estado["habilidad"] = habilidad
         usuarios_estado[user_id] = estado
-        return f"Gracias por contarme eso. Por lo que decís, podría ser que estés sintiendo *{emocion_detectada}*. ¿Te suena eso? (Responé 'sí' o 'no')"
+        return f"Parece que lo que estás sintiendo se relaciona con *{emocion_detectada}*. Para trabajar en eso, podríamos enfocarnos en fortalecer tu *{habilidad}*. ¿Te gustaría comenzar por ahí? (sí/no)"
 
-    if estado["fase"] == "emocion_detectada":
-        if texto_normalizado in RESPUESTAS_SI:
+    if estado["fase"] == "emocion_confirmada":
+        if texto in RESPUESTAS_SI:
             habilidad = estado["habilidad"]
-            estado["fase"] = "plan_sugerido"
             descripcion = descripcion_habilidades.get(habilidad, "una habilidad clave")
             herramienta = random.choice(herramientas[habilidad])
+            estado["fase"] = "plan_sugerido"
             usuarios_estado[user_id] = estado
-            return f"Genial. Entonces vamos a trabajar en *{habilidad}*, que es {descripcion}.\n\nTu primer reto es: {herramienta}"
-        elif texto_normalizado in RESPUESTAS_NO:
+            return f"Perfecto. Vamos a trabajar en *{habilidad}*, que es {descripcion}.\n\nTu primer reto práctico es: {herramienta}"
+        elif texto in RESPUESTAS_NO:
             estado["fase"] = "reinicio"
             usuarios_estado[user_id] = estado
-            return "Ok, vamos a intentar identificar otra emoción. Contame de nuevo qué está pasando."
+            return "Ok, podemos replantearlo. Contame un poco más sobre lo que estás sintiendo."
         else:
-            return "Perdón, necesito que me confirmes si la emoción que mencioné te suena o no. Escribí 'sí' o 'no'."
+            return "¿Querés que trabajemos esa habilidad? Respondé sí o no."
 
     if estado["fase"] == "plan_sugerido":
-        return "Ya comenzamos tu plan. Si querés seguir con otro desafío, contame una nueva situación."
+        return "Ya comenzamos tu plan. Si querés trabajar otra situación, contame qué te está pasando."
 
     if estado["fase"] == "reinicio":
-        estado["fase"] = "inicio"
+        estado["fase"] = "esperando_descripcion"
         usuarios_estado[user_id] = estado
-        return procesar_mensaje(mensaje, user_id)
+        return "Volvamos al inicio. Contame qué te está preocupando."
 
-    return "Estoy procesando tu emoción. Gracias por compartirla."
+    return "Estoy procesando lo que me compartiste. Gracias por tu paciencia."
 
 def handle_message(update, context):
     texto = update.message.text
