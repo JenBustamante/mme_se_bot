@@ -96,9 +96,7 @@ def procesar_mensaje(mensaje, user_id):
             descripcion = descripcion_habilidades.get(habilidad, "una habilidad clave")
             herramienta = random.choice(herramientas[habilidad])
             usuarios_estado[user_id] = estado
-            return f"Genial. Entonces vamos a trabajar en *{habilidad}*, que es {descripcion}.
-
-Tu primer reto es: {herramienta}"
+            return f"Genial. Entonces vamos a trabajar en *{habilidad}*, que es {descripcion}.\n\nTu primer reto es: {herramienta}"
         elif texto_normalizado in RESPUESTAS_NO:
             estado["fase"] = "reinicio"
             usuarios_estado[user_id] = estado
