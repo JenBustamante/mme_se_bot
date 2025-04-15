@@ -48,8 +48,26 @@ RESPUESTAS_SI = ["sí", "si", "sí.", "si.", "claro", "exacto", "eso"]
 RESPUESTAS_NO = ["no", "no.", "nop", "negativo"]
 SALUDOS_INICIALES = ["hola", "buenas", "buenos días", "buenas tardes", "buenas noches"]
 
+def procesar_mensaje(mensaje, user_id):
+    texto = mensaje.strip().lower()
+    estado = usuarios_estado.get(user_id, {})
 
-// (fragmento modificado del código anterior, omitiendo repeticiones)
+    if any(s in texto for s in SALUDOS_INICIALES) and "fase" not in estado:
+        estado["fase"] = "introduccion"
+        usuarios_estado[user_id] = estado
+        return (
+            "¡Hola! Estoy aquí para acompañarte a desarrollar habilidades que te ayuden a afrontar lo que estás viviendo. "
+            "Antes de seguir, te cuento cómo vamos a trabajar juntas/os:\n\n"
+            "1. Vamos a *identificar* lo que estás sintiendo\n"
+            "2. Vamos a *nombrarlo* con claridad\n"
+            "3. Vamos a *entender* de dónde viene\n"
+            "4. Y después, te propongo un *plan práctico* para enfrentarlo\n\n"
+            "¿Te gustaría comenzar contándome qué te está preocupando o afectando últimamente?"
+        )
+
+    if "fase" not in estado:
+        estado["fase"] = "esperando_descripcion"
+        usuarios_estado[user_id] = estado
 
     if estado["fase"] == "esperando_descripcion":
         estado["mensaje_usuario"] = mensaje
@@ -92,9 +110,22 @@ SALUDOS_INICIALES = ["hola", "buenas", "buenos días", "buenas tardes", "buenas 
         usuarios_estado[user_id] = estado
 
         return (
-            f"Gracias por compartir todo eso conmigo. Por lo que me contás, podría ser que estés sintiendo *{emocion_detectada}*.\n"
+            f"Gracias por compartir todo eso conmigo. Por lo que me contás, podría ser que estés sintiendo *{emocion_detectada}*.",
             f"¿Te hace sentido eso? Si querés, podemos trabajarla desarrollando tu habilidad de *{habilidad}*.\n¿Querés empezar por ahí? (sí/no)"
         )
+
+    if estado["fase"] == "emocion_confirmada":
+        if texto in RESPUESTAS_SI:
+            habilidad = estado["habilidad"]
+            estado["fase"] = "plan_sugerido"
+            usuarios_estado[user_id] = estado
+            return planes_personalizados.get(habilidad, "Vamos a empezar con pequeños pasos para trabajar esa habilidad. ¿Vamos?")
+        elif texto in RESPUESTAS_NO:
+            estado["fase"] = "reinicio"
+            usuarios_estado[user_id] = estado
+            return "Está bien, contame un poco más para buscar otra forma de abordarlo."
+        else:
+            return "¿Querés que trabajemos esa habilidad? Respondé sí o no."
 
     if estado["fase"] == "plan_sugerido":
         habilidad = estado["habilidad"]
@@ -107,6 +138,17 @@ SALUDOS_INICIALES = ["hola", "buenas", "buenos días", "buenas tardes", "buenas 
             "Para lograrlo, vamos a armar un plan de pequeños retos diarios. Yo puedo enviarte recordatorios todos los días para ver cómo te fue y ayudarte a ajustar lo que sigue.\n\n"
             f"{herramienta}"
         )
+
+    if estado["fase"] == "primer_reto":
+        return "Si querés avanzar o revisar algo más, contame una nueva situación."
+
+    if estado["fase"] == "reinicio":
+        estado["fase"] = "esperando_descripcion"
+        usuarios_estado[user_id] = estado
+        return "Volvamos al inicio. Contame qué te está preocupando."
+
+    return "Estoy procesando lo que me compartiste. Gracias por tu paciencia."
+
 def handle_message(update, context):
     texto = update.message.text
     user_id = update.message.from_user.id
