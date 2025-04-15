@@ -149,7 +149,6 @@ return (
     f"Gracias por compartir todo eso conmigo. Por lo que me contás, podría ser que estés sintiendo *{emocion_detectada}*, que es {descripcion}.\n"
     f"¿Te hace sentido eso? Si querés, podemos trabajarla desarrollando tu habilidad de *{habilidad}*.\n"
     "¿Querés empezar por ahí? (sí/no)"
-)
 
         )
 
