@@ -137,10 +137,24 @@ def procesar_mensaje(mensaje, user_id):
         estado["habilidad"] = habilidad
         usuarios_estado[user_id] = estado
 
-        return (
-            f"Gracias por compartir todo eso conmigo. Por lo que me contás, podría ser que estés sintiendo *{emocion_detectada}*.\n"
-            f"¿Te hace sentido eso? Si querés, podemos trabajarla desarrollando tu habilidad de *{habilidad}*.\n"
-            "¿Querés empezar por ahí? (sí/no)"
+        descripcion_emociones = {
+    "ansiedad": "una sensación de alerta o tensión que suele surgir cuando anticipamos que algo malo puede pasar",
+    "culpa": "una emoción que aparece cuando sentimos que hicimos algo mal o que fallamos en nuestros propios valores",
+    "tristeza": "una respuesta emocional natural ante una pérdida o desilusión",
+    "enojo": "una reacción emocional ante una injusticia o algo que nos frustra",
+    "vergüenza": "una emoción que aparece cuando sentimos que somos juzgados negativamente por otros",
+    "abandono": "una sensación de vacío o desconexión emocional de quienes consideramos importantes",
+    "miedo": "una respuesta que aparece ante una amenaza real o imaginada, con el objetivo de protegernos",
+    "frustración": "una emoción que surge cuando algo se interpone en lo que queremos lograr"
+}
+descripcion = descripcion_emociones.get(emocion_detectada, "una emoción que puede tener muchas causas y formas de experimentarse")
+return (
+    f"Gracias por compartir todo eso conmigo. Por lo que me contás, podría ser que estés sintiendo *{emocion_detectada}*, que es {descripcion}.
+"
+    f"¿Te hace sentido eso? Si querés, podemos trabajarla desarrollando tu habilidad de *{habilidad}*.
+"
+    "¿Querés empezar por ahí? (sí/no)"
+)
         )
 
     if estado.get("fase") == "emocion_confirmada":
