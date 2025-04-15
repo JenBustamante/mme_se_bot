@@ -14,6 +14,7 @@ emociones_habilidades = {
     "ansiedad": "autorregulación",
     "tristeza": "autoconciencia",
     "enojo": "toma de decisiones responsable",
+    "frustración": "autorregulación",
     "soledad": "conciencia social",
     "inseguridad": "confianza",
     "culpa": "toma de decisiones responsable"
@@ -67,35 +68,65 @@ def procesar_mensaje(mensaje, user_id):
     estado = usuarios_estado.get(user_id, {})
 
     if any(s in texto for s in SALUDOS_INICIALES) and "fase" not in estado:
-        estado["fase"] = "esperando_descripcion"
+        estado["fase"] = "introduccion"
         usuarios_estado[user_id] = estado
-        return "¡Hola! Estoy aquí para ayudarte a desarrollar habilidades que te ayuden a afrontar lo que estás viviendo. Contame, ¿qué te está preocupando en este momento?"
+        return (
+            "¡Hola! Estoy aquí para acompañarte a desarrollar habilidades que te ayuden a afrontar lo que estás viviendo. "
+            "Antes de seguir, te cuento cómo vamos a trabajar juntas/os:\n\n"
+            "1. Vamos a *identificar* lo que estás sintiendo\n"
+            "2. Vamos a *nombrarlo* con claridad\n"
+            "3. Vamos a *entender* de dónde viene\n"
+            "4. Y después, te propongo un *plan práctico* para enfrentarlo\n\n"
+            "¿Te gustaría comenzar contándome qué te está preocupando o afectando últimamente?"
+        )
 
     if "fase" not in estado:
         estado["fase"] = "esperando_descripcion"
         usuarios_estado[user_id] = estado
 
+    if estado["fase"] == "introduccion":
+        estado["fase"] = "esperando_descripcion"
+        usuarios_estado[user_id] = estado
+        return "Perfecto, contame entonces qué situación o pensamiento te está afectando hoy."
+
     if estado["fase"] == "esperando_descripcion":
         estado["mensaje_usuario"] = mensaje
+        estado.setdefault("historial", []).append(mensaje)
         estado["fase"] = "indagacion_1"
         usuarios_estado[user_id] = estado
-        return "Gracias por compartirlo. ¿Qué es lo más difícil de esa situación para vos?"
+        return "Gracias por compartirlo. Vamos a seguir explorando juntas/os. ¿Qué es lo más difícil de esa situación para vos?"
 
     if estado["fase"] == "indagacion_1":
         estado["indagacion_1"] = mensaje
+        estado.setdefault("historial", []).append(mensaje)
         estado["fase"] = "indagacion_2"
         usuarios_estado[user_id] = estado
         return "¿Y en esos momentos, notás alguna sensación física o pensamientos que se repitan?"
 
     if estado["fase"] == "indagacion_2":
         estado["indagacion_2"] = mensaje
+        estado.setdefault("historial", []).append(mensaje)
         estado["fase"] = "emocion_confirmada"
-        emocion_detectada = "ansiedad" if "trabajo" in estado["mensaje_usuario"] else "tristeza"
+
+        texto_total = " ".join(estado.get("historial", []))
+        if "trabajo" in texto_total and "control" in texto_total:
+            emocion_detectada = "frustración"
+        elif "triste" in texto_total:
+            emocion_detectada = "tristeza"
+        elif "ansioso" in texto_total or "ansiedad" in texto_total:
+            emocion_detectada = "ansiedad"
+        else:
+            emocion_detectada = random.choice(list(emociones_habilidades.keys()))
+
         habilidad = emociones_habilidades[emocion_detectada]
         estado["emocion"] = emocion_detectada
         estado["habilidad"] = habilidad
         usuarios_estado[user_id] = estado
-        return f"Parece que lo que estás sintiendo se relaciona con *{emocion_detectada}*. Para trabajar en eso, podríamos enfocarnos en fortalecer tu *{habilidad}*. ¿Te gustaría comenzar por ahí? (sí/no)"
+
+        return (
+            f"Por lo que me contás, podría ser que estés sintiendo *{emocion_detectada}*.\n"
+            f"¿Te hace sentido eso? Podemos trabajarla desarrollando tu habilidad de *{habilidad}*. ¿Querés empezar por ahí? (sí/no)"
+        )
 
     if estado["fase"] == "emocion_confirmada":
         if texto in RESPUESTAS_SI:
@@ -108,7 +139,7 @@ def procesar_mensaje(mensaje, user_id):
         elif texto in RESPUESTAS_NO:
             estado["fase"] = "reinicio"
             usuarios_estado[user_id] = estado
-            return "Ok, podemos replantearlo. Contame un poco más sobre lo que estás sintiendo."
+            return "Está bien, contame un poco más para buscar otra forma de abordarlo."
         else:
             return "¿Querés que trabajemos esa habilidad? Respondé sí o no."
 
