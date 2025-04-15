@@ -32,6 +32,11 @@ emociones_habilidades = {
 }
 
 descripcion_habilidades = {
+    "autorregulación": "la capacidad de manejar emociones intensas como el enojo, la frustración o el miedo, sin dejar que tomen el control",
+    "autoconciencia": "la habilidad de identificar lo que sentís, ponerle nombre y entender de dónde viene",
+    "toma de decisiones responsable": "la capacidad de evaluar opciones y actuar de forma ética, segura y coherente con tus valores",
+    "conciencia social": "la habilidad de comprender y respetar las emociones y necesidades de los demás",
+    "confianza": "la seguridad interna de que tenés valor, incluso cuando las cosas no salen como esperabas"
     "autorregulación": "la capacidad de manejar emociones intensas de forma saludable",
     "autoconciencia": "la habilidad de entender lo que sentís y por qué",
     "toma de decisiones responsable": "la capacidad de elegir conductas seguras y éticas",
@@ -147,13 +152,16 @@ def procesar_mensaje(mensaje, user_id):
     "miedo": "una respuesta que aparece ante una amenaza real o imaginada, con el objetivo de protegernos",
     "frustración": "una emoción que surge cuando algo se interpone en lo que queremos lograr"
 }
+
 descripcion = descripcion_emociones.get(emocion_detectada, "una emoción que puede tener muchas causas y formas de experimentarse")
+
 return (
     f"Gracias por compartir todo eso conmigo. Por lo que me contás, podría ser que estés sintiendo *{emocion_detectada}*, que es {descripcion}.
 "
     f"¿Te hace sentido eso? Si querés, podemos trabajarla desarrollando tu habilidad de *{habilidad}*.
 "
     "¿Querés empezar por ahí? (sí/no)"
+)"
 )
         )
 
