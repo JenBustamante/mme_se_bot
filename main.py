@@ -37,11 +37,6 @@ descripcion_habilidades = {
     "toma de decisiones responsable": "la capacidad de evaluar opciones y actuar de forma ética, segura y coherente con tus valores",
     "conciencia social": "la habilidad de comprender y respetar las emociones y necesidades de los demás",
     "confianza": "la seguridad interna de que tenés valor, incluso cuando las cosas no salen como esperabas"
-    "autorregulación": "la capacidad de manejar emociones intensas de forma saludable",
-    "autoconciencia": "la habilidad de entender lo que sentís y por qué",
-    "toma de decisiones responsable": "la capacidad de elegir conductas seguras y éticas",
-    "conciencia social": "la habilidad de entender a los demás y actuar con empatía",
-    "confianza": "una valoración sólida de vos misma/o basada en tu valor, no en la aprobación externa"
 }
 
 planes_personalizados = {
@@ -71,7 +66,8 @@ retos_narrativos = {
 }
 
 usuarios_estado = {}
-seguimiento_usuarios = {}
+# seguimiento_usuarios deshabilitado por ahora
+# seguimiento_usuarios = {}
 
 RESPUESTAS_SI = ["sí", "si", "sí.", "si.", "claro", "exacto", "eso"]
 RESPUESTAS_NO = ["no", "no.", "nop", "negativo"]
@@ -81,13 +77,9 @@ def procesar_mensaje(mensaje, user_id):
     texto = mensaje.strip().lower()
     estado = usuarios_estado.get(user_id, {})
 
-    if user_id in seguimiento_usuarios:
-        seguimiento = seguimiento_usuarios[user_id]
-        fecha_guardada = datetime.strptime(seguimiento["fecha"], "%Y-%m-%d")
-        if seguimiento["pendiente"] and datetime.now() - fecha_guardada >= timedelta(days=1):
-            return f"¡Hola! Solo quería saber cómo te fue con el reto sobre *{seguimiento['habilidad']}*. ¿Querés contarme si lo pudiste hacer o si preferís cambiarlo?"
-
-    if any(s in texto for s in SALUDOS_INICIALES) and "fase" not in estado:
+    
+    if any(s in texto for s in SALUDOS_INICIALES):
+        estado = {}
         estado["fase"] = "introduccion"
         usuarios_estado[user_id] = estado
         return (
@@ -156,12 +148,11 @@ def procesar_mensaje(mensaje, user_id):
 descripcion = descripcion_emociones.get(emocion_detectada, "una emoción que puede tener muchas causas y formas de experimentarse")
 
 return (
-    f"Gracias por compartir todo eso conmigo. Por lo que me contás, podría ser que estés sintiendo *{emocion_detectada}*, que es {descripcion}.
-"
-    f"¿Te hace sentido eso? Si querés, podemos trabajarla desarrollando tu habilidad de *{habilidad}*.
-"
+    f"Gracias por compartir todo eso conmigo. Por lo que me contás, podría ser que estés sintiendo *{emocion_detectada}*, que es {descripcion}.\n"
+    f"¿Te hace sentido eso? Si querés, podemos trabajarla desarrollando tu habilidad de *{habilidad}*.\n"
     "¿Querés empezar por ahí? (sí/no)"
-)"
+)
+
 )
         )
 
@@ -184,13 +175,7 @@ return (
         herramienta = retos_narrativos.get(habilidad, ["Este es tu primer reto: observá tus reacciones con atención. Luego vamos a profundizar."])[0]
         estado["fase"] = "primer_reto"
         usuarios_estado[user_id] = estado
-        seguimiento_usuarios[user_id] = {
-            "fecha": datetime.now().strftime("%Y-%m-%d"),
-            "reto": herramienta,
-            "habilidad": habilidad,
-            "pendiente": True
-        }
-        return (
+                return (
             f"Entonces el primer objetivo será ayudarte a fortalecer tu *{habilidad}*, que es {descripcion}.\n\n"
             "Para lograrlo, vamos a armar un plan de pequeños retos diarios. Yo puedo enviarte recordatorios todos los días para ver cómo te fue y ayudarte a ajustar lo que sigue.\n\n"
             f"{herramienta}"
