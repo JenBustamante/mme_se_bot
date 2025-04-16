@@ -151,7 +151,6 @@ return (
     "¿Querés empezar por ahí? (sí/no)"
 
         )
-
     if estado.get("fase") == "emocion_confirmada":
         if texto in RESPUESTAS_SI:
             habilidad = estado["habilidad"]
