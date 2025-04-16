@@ -31,6 +31,9 @@ emociones_habilidades = {
     "inseguridad": "confianza"
 }
 
+# Nueva lista de emociones para mejorar la detección
+lista_emociones = list(emociones_habilidades.keys())
+
 descripcion_habilidades = {
     "autorregulación": "la capacidad de manejar emociones intensas como el enojo, la frustración o el miedo, sin dejar que tomen el control",
     "autoconciencia": "la habilidad de identificar lo que sentís, ponerle nombre y entender de dónde viene",
@@ -47,21 +50,28 @@ SALUDOS_INICIALES = ["hola", "buenas", "buenos días", "buenas tardes", "buenas 
 
 retos_narrativos = {
     "autorregulación": [
-        "Hoy vamos a enfocarnos en una técnica de respiración consciente. La respiración diafragmática es una herramienta poderosa para ayudar a tu cuerpo a salir del estado de alerta cuando sentís ansiedad. El reto es practicarla dos veces hoy, durante 3 a 5 minutos cada vez. Buscá un lugar tranquilo, sentate con la espalda recta y probá este ritmo: inhalá en 4 tiempos, sostené el aire 4 tiempos, y exhalá en 6 tiempos. Después, registrá cómo te sentís antes y después de la práctica."
+        "Hoy vamos a enfocarnos en una técnica de respiración consciente..."
     ],
     "autoconciencia": [
-        "Hoy vas a escribir en un diario emocional sobre una situación reciente que te hizo sentir incómodo o confundido. Anotá qué pasó, cómo reaccionaste y qué emociones identificás en ese momento. Esta práctica de registro ayuda a mejorar la autoconciencia emocional."
+        "Hoy vas a escribir en un diario emocional..."
     ],
     "toma de decisiones responsable": [
-        "El reto de hoy es una simulación de decisiones. Escribí una situación imaginaria donde tengas que decidir entre lo correcto y lo fácil. Describí tus opciones, pensá en las consecuencias de cada una y luego elegí conscientemente."
+        "El reto de hoy es una simulación de decisiones..."
     ],
     "conciencia social": [
-        "Observá una conversación o interacción (presencial o virtual) y tratá de ponerte en el lugar de la otra persona: ¿Qué pudo haber estado sintiendo? ¿Qué necesidad emocional podría haber detrás de su comportamiento? Anotá tu reflexión."
+        "Observá una conversación o interacción..."
     ],
     "confianza": [
-        "Anotá tres momentos de tu vida donde lograste algo importante. Luego escribí qué habilidades o fortalezas usaste para lograrlo."
+        "Anotá tres momentos de tu vida donde lograste algo importante..."
     ]
 }
+
+def detectar_emocion(texto):
+    conteo = {emocion: texto.count(emocion) for emocion in lista_emociones}
+    emocion_detectada = max(conteo, key=conteo.get)
+    if conteo[emocion_detectada] == 0:
+        return "tristeza"
+    return emocion_detectada
 
 def procesar_mensaje(mensaje, user_id):
     texto = mensaje.strip().lower()
@@ -72,16 +82,7 @@ def procesar_mensaje(mensaje, user_id):
         estado["fase"] = "esperando_descripcion"
         usuarios_estado[user_id] = estado
         return (
-            """¡Hola! Gracias por estar acá. Me alegra que hayas llegado. Este es un espacio pensado para ayudarte a desarrollar habilidades sociales y emocionales que te permitan afrontar los desafíos de la vida con más claridad y bienestar.
-
-Antes de comenzar, quiero aclararte algo importante: esto no es terapia, ni busca reemplazarla. Lo que vas a encontrar acá son herramientas prácticas y basadas en evidencia científica — desde la psicología cognitivo-conductual y el enfoque de CASEL — para ayudarte a vivir mejor.
-
-1. Vamos a *identificar* lo que estás sintiendo
-2. Vamos a *nombrarlo* con claridad
-3. Vamos a *entender* de dónde viene
-4. Y después, te propongo un *plan práctico* para enfrentarlo
-
-¿Te gustaría comenzar contándome qué te está preocupando o afectando últimamente?"""
+            """¡Hola! Gracias por estar acá... ¿Te gustaría comenzar contándome qué te está preocupando o afectando últimamente?"""
         )
 
     if estado.get("fase") == "esperando_descripcion":
@@ -102,11 +103,7 @@ Antes de comenzar, quiero aclararte algo importante: esto no es terapia, ni busc
         estado["indagacion_2"] = mensaje
         estado.setdefault("historial", []).append(mensaje)
         texto_total = " ".join(estado.get("historial", []))
-        emocion_detectada = "tristeza"
-        for emocion in emociones_habilidades:
-            if emocion in texto_total:
-                emocion_detectada = emocion
-                break
+        emocion_detectada = detectar_emocion(texto_total)
         habilidad = emociones_habilidades[emocion_detectada]
         descripcion = descripcion_habilidades.get(habilidad, "una habilidad clave para tu bienestar emocional")
         estado["fase"] = "emocion_confirmada"
@@ -114,9 +111,10 @@ Antes de comenzar, quiero aclararte algo importante: esto no es terapia, ni busc
         estado["habilidad"] = habilidad
         usuarios_estado[user_id] = estado
         return (
-            f"Por lo que me contás, podrías estar sintiendo *{emocion_detectada}*. Esta emoción suele aparecer en momentos de desafío o cambio.\n"
-            f"Podemos trabajarla desarrollando tu habilidad de *{habilidad}*, que es {descripcion}.\n"
-            "¿Te hace sentido esto? ¿Querés trabajar en esa habilidad? (sí/no)"
+            f"Gracias por contarme más. Por lo que me compartiste, parece que hay muchas emociones en juego.\n"
+            f"Una emoción que podría estar presente es *{emocion_detectada}*. Esta suele aparecer en momentos como este.\n"
+            f"Para trabajarla, podemos enfocarnos en desarrollar la habilidad de *{habilidad}*, que significa {descripcion}.\n"
+            "¿Te gustaría que exploremos esa habilidad juntos? (sí/no)"
         )
 
     if estado.get("fase") == "emocion_confirmada":
@@ -126,13 +124,18 @@ Antes de comenzar, quiero aclararte algo importante: esto no es terapia, ni busc
             estado["fase"] = "reto_entregado"
             usuarios_estado[user_id] = estado
             return (
-                f"Perfecto. Vamos a comenzar a trabajar en *{habilidad}*.\n\n"
-                f"Tu primer reto es el siguiente:\n\n{reto}\n\n¿Querés que mañana te recuerde cómo te fue con este reto?"
+                f"Perfecto. Vamos a comenzar a trabajar en *{habilidad}*.
+
+Tu primer reto es el siguiente:
+
+{reto}
+
+¿Querés que mañana te recuerde cómo te fue con este reto?"
             )
         elif texto in RESPUESTAS_NO:
             estado["fase"] = "esperando_descripcion"
             usuarios_estado[user_id] = estado
-            return "Está bien. Podemos explorar otra emoción o situación si querés. Contame más."
+            return "Entiendo. Si querés contarme más sobre lo que te pasa, acá estoy."
         else:
             return "¿Querés que trabajemos esa habilidad? Respondé sí o no."
 
