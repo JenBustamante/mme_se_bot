@@ -51,7 +51,7 @@ def procesar_mensaje(mensaje, user_id):
 
     if any(s in texto for s in SALUDOS_INICIALES):
         estado = {}
-        estado["fase"] = "introduccion"
+        estado["fase"] = "esperando_descripcion"
         usuarios_estado[user_id] = estado
         return (
             """¡Hola! Gracias por estar acá. Me alegra que hayas llegado. Este es un espacio pensado para ayudarte a desarrollar habilidades sociales y emocionales que te permitan afrontar los desafíos de la vida con más claridad y bienestar.
@@ -65,6 +65,29 @@ Antes de comenzar, quiero aclararte algo importante: esto no es terapia, ni busc
 
 ¿Te gustaría comenzar contándome qué te está preocupando o afectando últimamente?"""
         )
+
+    if estado.get("fase") == "esperando_descripcion":
+        emocion_detectada = "tristeza"
+        for emocion in emociones_habilidades:
+            if emocion in texto:
+                emocion_detectada = emocion
+                break
+        habilidad = emociones_habilidades[emocion_detectada]
+        descripcion = descripcion_habilidades.get(habilidad, "una habilidad importante para tu bienestar emocional")
+        estado["fase"] = "emocion_detectada"
+        usuarios_estado[user_id] = estado
+        return (
+            f"Gracias por contarme eso. Por lo que me decís, tal vez estés sintiendo *{emocion_detectada}*. Podemos trabajarla desarrollando tu habilidad de *{habilidad}*, que es {descripcion}.\n\n"
+            "¿Querés empezar por ahí? (sí/no)"
+        )
+
+    if estado.get("fase") == "emocion_detectada":
+        if texto in RESPUESTAS_SI:
+            return "Perfecto. En breve te voy a proponer un primer reto práctico para empezar."
+        elif texto in RESPUESTAS_NO:
+            return "Está bien. Podemos explorar otra cosa si lo preferís. Contame más."
+        else:
+            return "¿Querés que trabajemos esa habilidad? Respondé sí o no."
 
     return "Estoy procesando lo que me compartiste. Gracias por tu paciencia."
 
