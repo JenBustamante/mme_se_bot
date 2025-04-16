@@ -68,10 +68,9 @@ retos_narrativos = {
 
 def detectar_emocion(texto):
     conteo = {emocion: texto.count(emocion) for emocion in lista_emociones}
-    emocion_detectada = max(conteo, key=conteo.get)
-    if conteo[emocion_detectada] == 0:
-        return "tristeza"
-    return emocion_detectada
+    emociones_probables = sorted(conteo.items(), key=lambda x: x[1], reverse=True)
+    top_emociones = [emocion for emocion, count in emociones_probables if count > 0][:3]
+    return top_emociones if top_emociones else ["tristeza"]
 
 def procesar_mensaje(mensaje, user_id):
     texto = mensaje.strip().lower()
@@ -82,7 +81,7 @@ def procesar_mensaje(mensaje, user_id):
         estado["fase"] = "esperando_descripcion"
         usuarios_estado[user_id] = estado
         return (
-            """¡Hola! Gracias por estar acá... ¿Te gustaría comenzar contándome qué te está preocupando o afectando últimamente?"""
+            "¡Hola! Gracias por estar acá. Me alegra que hayas llegado. Este es un espacio pensado para ayudarte a desarrollar habilidades sociales y emocionales que te permitan afrontar los desafíos de la vida con más claridad y bienestar.\n\nQuiero aclararte que esto no es ni pretende ser terapia. No reemplaza la ayuda profesional.\n\nLo que vas a encontrar acá es ciencia: herramientas prácticas basadas en teoría cognitivo-conductual, aprendizaje social y emocional, y evidencia que ha demostrado ayudar a las personas a sentirse mejor y superar retos.\n\n¿Te gustaría comenzar contándome qué te está preocupando o afectando últimamente?"
         )
 
     if estado.get("fase") == "esperando_descripcion":
@@ -103,33 +102,45 @@ def procesar_mensaje(mensaje, user_id):
         estado["indagacion_2"] = mensaje
         estado.setdefault("historial", []).append(mensaje)
         texto_total = " ".join(estado.get("historial", []))
-        emocion_detectada = detectar_emocion(texto_total)
-        habilidad = emociones_habilidades[emocion_detectada]
-        descripcion = descripcion_habilidades.get(habilidad, "una habilidad clave para tu bienestar emocional")
+        emociones_detectadas = detectar_emocion(texto_total)
+        opciones = "\n".join([f"- {e}" for e in emociones_detectadas])
         estado["fase"] = "emocion_confirmada"
-        estado["emocion"] = emocion_detectada
-        estado["habilidad"] = habilidad
+        estado["emociones_opciones"] = emociones_detectadas
         usuarios_estado[user_id] = estado
         return (
-            f"Gracias por contarme más. Por lo que me compartiste, parece que hay muchas emociones en juego.\n"
-            f"Una emoción que podría estar presente es *{emocion_detectada}*. Esta suele aparecer en momentos como este.\n"
-            f"Para trabajarla, podemos enfocarnos en desarrollar la habilidad de *{habilidad}*, que significa {descripcion}.\n"
-            "¿Te gustaría que exploremos esa habilidad juntos? (sí/no)"
+            f"Gracias por contarme más. Por lo que me compartiste, parece que hay varias emociones en juego.\n\n"
+            f"Estas podrían ser algunas de ellas:\n{opciones}\n\n"
+            "¿Te sentís identificado con alguna de estas? Si es así, escribila tal como aparece en la lista."
         )
 
     if estado.get("fase") == "emocion_confirmada":
+        if texto in estado.get("emociones_opciones", []):
+            emocion_detectada = texto
+            habilidad = emociones_habilidades[emocion_detectada]
+            descripcion = descripcion_habilidades.get(habilidad, "una habilidad clave para tu bienestar emocional")
+            estado["habilidad"] = habilidad
+            estado["fase"] = "aceptar_trabajo"
+            usuarios_estado[user_id] = estado
+            return (
+                f"Gracias por compartir eso. Entonces podría ser que estés sintiendo *{emocion_detectada}*.\n"
+                f"Para trabajar esa emoción, podemos enfocarnos en desarrollar tu habilidad de *{habilidad}*, que significa {descripcion}.\n\n"
+                "¿Te gustaría que exploremos esa habilidad juntos? (sí/no)"
+            )
+        else:
+            return "No encontré esa emoción en la lista anterior. ¿Podrías escribirla exactamente como aparecía?"
+
+    if estado.get("fase") == "aceptar_trabajo":
         if texto in RESPUESTAS_SI:
             habilidad = estado["habilidad"]
             reto = retos_narrativos.get(habilidad, ["Vamos a empezar con pequeños pasos."])[0]
             estado["fase"] = "reto_entregado"
             usuarios_estado[user_id] = estado
             return (
-    f"Perfecto. Vamos a comenzar a trabajar en *{habilidad}*.\n\n"
-    f"Tu primer reto es el siguiente:\n\n"
-    f"{reto}\n\n"
-    "¿Querés que mañana te recuerde cómo te fue con este reto?"
-)
-
+                f"Perfecto. Vamos a comenzar a trabajar en *{habilidad}*.\n\n"
+                f"Tu primer reto es el siguiente:\n\n"
+                f"{reto}\n\n"
+                "¿Querés que mañana te recuerde cómo te fue con este reto?"
+            )
         elif texto in RESPUESTAS_NO:
             estado["fase"] = "esperando_descripcion"
             usuarios_estado[user_id] = estado
