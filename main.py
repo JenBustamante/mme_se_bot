@@ -124,14 +124,12 @@ def procesar_mensaje(mensaje, user_id):
             estado["fase"] = "reto_entregado"
             usuarios_estado[user_id] = estado
             return (
-                f"Perfecto. Vamos a comenzar a trabajar en *{habilidad}*.
+    f"Perfecto. Vamos a comenzar a trabajar en *{habilidad}*.\n\n"
+    f"Tu primer reto es el siguiente:\n\n"
+    f"{reto}\n\n"
+    "¿Querés que mañana te recuerde cómo te fue con este reto?"
+)
 
-Tu primer reto es el siguiente:
-
-{reto}
-
-¿Querés que mañana te recuerde cómo te fue con este reto?"
-            )
         elif texto in RESPUESTAS_NO:
             estado["fase"] = "esperando_descripcion"
             usuarios_estado[user_id] = estado
