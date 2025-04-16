@@ -95,7 +95,7 @@ Antes de comenzar, quiero aclararte algo importante: esto no es terapia, ni busc
     if estado.get("fase") == "introduccion":
         estado["fase"] = "esperando_descripcion"
         usuarios_estado[user_id] = estado
-        return "Perfecto, contame entonces qué situación o pensamiento te está afectando hoy."
+        return "Qué es lo que exactamente no te gusta de esta situación?."
 
     if estado.get("fase") == "esperando_descripcion":
         estado["mensaje_usuario"] = mensaje
@@ -151,7 +151,8 @@ Antes de comenzar, quiero aclararte algo importante: esto no es terapia, ni busc
 "
             f"¿Te hace sentido eso? Si querés, podemos trabajarla desarrollando tu habilidad de *{habilidad}*.
 "
-            "¿Querés empezar por ahí? (sí/no)"
+            "¿Querés empezar por ahí? (sí/no)
+"
         )
 
     if estado.get("fase") == "emocion_confirmada":
