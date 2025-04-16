@@ -81,7 +81,10 @@ def procesar_mensaje(mensaje, user_id):
         estado["fase"] = "esperando_descripcion"
         usuarios_estado[user_id] = estado
         return (
-            "¡Hola! Gracias por estar acá. Me alegra que hayas llegado. Este es un espacio pensado para ayudarte a desarrollar habilidades sociales y emocionales que te permitan afrontar los desafíos de la vida con más claridad y bienestar.\n\nQuiero aclararte que esto no es ni pretende ser terapia. No reemplaza la ayuda profesional.\n\nLo que vas a encontrar acá es ciencia: herramientas prácticas basadas en teoría cognitivo-conductual, aprendizaje social y emocional, y evidencia que ha demostrado ayudar a las personas a sentirse mejor y superar retos.\n\n¿Te gustaría comenzar contándome qué te está preocupando o afectando últimamente?"
+          "¡Hola! Gracias por estar acá. Me alegra que hayas llegado. Este es un espacio pensado para ayudarte a desarrollar habilidades sociales y emocionales que te permitan afrontar los desafíos de la vida con más claridad y bienestar.\n\n"
+            "Quiero aclararte que esto no es ni pretende ser terapia.\n\n"
+            "Lo que vas a encontrar acá es ciencia: herramientas prácticas basadas en teoría cognitivo-conductual, el enfoque CASEL y buenas prácticas de enseñanza socioemocional. Todas ellas están basadas en evidencia y han demostrado ser efectivas para ayudar a las personas a sentirse mejor y superar retos.\n\n"
+            "¿Te gustaría comenzar contándome qué te está preocupando o afectando últimamente?"
         )
 
     if estado.get("fase") == "esperando_descripcion":
