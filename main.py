@@ -75,18 +75,26 @@ def procesar_mensaje(mensaje, user_id):
     texto = mensaje.strip().lower()
     estado = usuarios_estado.get(user_id, {})
 
-    
     if any(s in texto for s in SALUDOS_INICIALES):
         estado = {}
         estado["fase"] = "introduccion"
         usuarios_estado[user_id] = estado
         return (
-            "¡Hola! Gracias por estar acá. Me alegra que hayas llegado. Este es un espacio pensado para ayudarte a desarrollar habilidades sociales y emocionales que te permitan afrontar los desafíos de la vida con más claridad y bienestar.\n\n"
-            "Antes de comenzar, quiero aclararte algo importante: esto no es terapia, ni busca reemplazarla. Lo que vas a encontrar acá son herramientas prácticas y basadas en evidencia científica — desde la psicología cognitivo-conductual y el enfoque de CASEL — para ayudarte a vivir mejor.\n\n"
-            "1. Vamos a *identificar* lo que estás sintiendo\n"
-            "2. Vamos a *nombrarlo* con claridad\n"
-            "3. Vamos a *entender* de dónde viene\n"
-            "4. Y después, te propongo un *plan práctico* para enfrentarlo\n\n"
+            "¡Hola! Gracias por estar acá. Me alegra que hayas llegado. Este es un espacio pensado para ayudarte a desarrollar habilidades sociales y emocionales que te permitan afrontar los desafíos de la vida con más claridad y bienestar.
+
+"
+            "Antes de comenzar, quiero aclararte algo importante: esto no es terapia, ni busca reemplazarla. Lo que vas a encontrar acá son herramientas prácticas y basadas en evidencia científica — desde la psicología cognitivo-conductual y el enfoque de CASEL — para ayudarte a vivir mejor.
+
+"
+            "1. Vamos a *identificar* lo que estás sintiendo
+"
+            "2. Vamos a *nombrarlo* con claridad
+"
+            "3. Vamos a *entender* de dónde viene
+"
+            "4. Y después, te propongo un *plan práctico* para enfrentarlo
+
+"
             "¿Te gustaría comenzar contándome qué te está preocupando o afectando últimamente?"
         )
 
@@ -128,29 +136,30 @@ def procesar_mensaje(mensaje, user_id):
                 break
 
         habilidad = emociones_habilidades[emocion_detectada]
+        descripcion_emociones = {
+            "ansiedad": "una sensación de alerta o tensión que suele surgir cuando anticipamos que algo malo puede pasar",
+            "culpa": "una emoción que aparece cuando sentimos que hicimos algo mal o que fallamos en nuestros propios valores",
+            "tristeza": "una respuesta emocional natural ante una pérdida o desilusión",
+            "enojo": "una reacción emocional ante una injusticia o algo que nos frustra",
+            "vergüenza": "una emoción que aparece cuando sentimos que somos juzgados negativamente por otros",
+            "abandono": "una sensación de vacío o desconexión emocional de quienes consideramos importantes",
+            "miedo": "una respuesta que aparece ante una amenaza real o imaginada, con el objetivo de protegernos",
+            "frustración": "una emoción que surge cuando algo se interpone en lo que queremos lograr"
+        }
+
+        descripcion = descripcion_emociones.get(emocion_detectada, "una emoción que puede tener muchas causas y formas de experimentarse")
         estado["emocion"] = emocion_detectada
         estado["habilidad"] = habilidad
         usuarios_estado[user_id] = estado
 
-        descripcion_emociones = {
-    "ansiedad": "una sensación de alerta o tensión que suele surgir cuando anticipamos que algo malo puede pasar",
-    "culpa": "una emoción que aparece cuando sentimos que hicimos algo mal o que fallamos en nuestros propios valores",
-    "tristeza": "una respuesta emocional natural ante una pérdida o desilusión",
-    "enojo": "una reacción emocional ante una injusticia o algo que nos frustra",
-    "vergüenza": "una emoción que aparece cuando sentimos que somos juzgados negativamente por otros",
-    "abandono": "una sensación de vacío o desconexión emocional de quienes consideramos importantes",
-    "miedo": "una respuesta que aparece ante una amenaza real o imaginada, con el objetivo de protegernos",
-    "frustración": "una emoción que surge cuando algo se interpone en lo que queremos lograr"
-}
-
-descripcion = descripcion_emociones.get(emocion_detectada, "una emoción que puede tener muchas causas y formas de experimentarse")
-
-return (
-    f"Gracias por compartir todo eso conmigo. Por lo que me contás, podría ser que estés sintiendo *{emocion_detectada}*, que es {descripcion}.\n"
-    f"¿Te hace sentido eso? Si querés, podemos trabajarla desarrollando tu habilidad de *{habilidad}*.\n"
-    "¿Querés empezar por ahí? (sí/no)"
-
+        return (
+            f"Gracias por compartir todo eso conmigo. Por lo que me contás, podría ser que estés sintiendo *{emocion_detectada}*, que es {descripcion}.
+"
+            f"¿Te hace sentido eso? Si querés, podemos trabajarla desarrollando tu habilidad de *{habilidad}*.
+"
+            "¿Querés empezar por ahí? (sí/no)"
         )
+
     if estado.get("fase") == "emocion_confirmada":
         if texto in RESPUESTAS_SI:
             habilidad = estado["habilidad"]
@@ -170,9 +179,13 @@ return (
         herramienta = retos_narrativos.get(habilidad, ["Este es tu primer reto: observá tus reacciones con atención. Luego vamos a profundizar."])[0]
         estado["fase"] = "primer_reto"
         usuarios_estado[user_id] = estado
-                return (
-            f"Entonces el primer objetivo será ayudarte a fortalecer tu *{habilidad}*, que es {descripcion}.\n\n"
-            "Para lograrlo, vamos a armar un plan de pequeños retos diarios. Yo puedo enviarte recordatorios todos los días para ver cómo te fue y ayudarte a ajustar lo que sigue.\n\n"
+        return (
+            f"Entonces el primer objetivo será ayudarte a fortalecer tu *{habilidad}*, que es {descripcion}.
+
+"
+            "Para lograrlo, vamos a armar un plan de pequeños retos diarios. Yo puedo enviarte recordatorios todos los días para ver cómo te fue y ayudarte a ajustar lo que sigue.
+
+"
             f"{herramienta}"
         )
 
