@@ -80,23 +80,17 @@ def procesar_mensaje(mensaje, user_id):
         estado["fase"] = "introduccion"
         usuarios_estado[user_id] = estado
         return (
-            "¡Hola! Gracias por estar acá. Me alegra que hayas llegado. Este es un espacio pensado para ayudarte a desarrollar habilidades sociales y emocionales que te permitan afrontar los desafíos de la vida con más claridad y bienestar.
+    """¡Hola! Gracias por estar acá. Me alegra que hayas llegado. Este es un espacio pensado para ayudarte a desarrollar habilidades sociales y emocionales que te permitan afrontar los desafíos de la vida con más claridad y bienestar.
 
-"
-            "Antes de comenzar, quiero aclararte algo importante: esto no es terapia, ni busca reemplazarla. Lo que vas a encontrar acá son herramientas prácticas y basadas en evidencia científica — desde la psicología cognitivo-conductual y el enfoque de CASEL — para ayudarte a vivir mejor.
+Antes de comenzar, quiero aclararte algo importante: esto no es terapia, ni busca reemplazarla. Lo que vas a encontrar acá son herramientas prácticas y basadas en evidencia científica — desde la psicología cognitivo-conductual y el enfoque de CASEL — para ayudarte a vivir mejor.
 
-"
-            "1. Vamos a *identificar* lo que estás sintiendo
-"
-            "2. Vamos a *nombrarlo* con claridad
-"
-            "3. Vamos a *entender* de dónde viene
-"
-            "4. Y después, te propongo un *plan práctico* para enfrentarlo
+1. Vamos a *identificar* lo que estás sintiendo  
+2. Vamos a *nombrarlo* con claridad  
+3. Vamos a *entender* de dónde viene  
+4. Y después, te propongo un *plan práctico* para enfrentarlo
 
-"
-            "¿Te gustaría comenzar contándome qué te está preocupando o afectando últimamente?"
-        )
+¿Te gustaría comenzar contándome qué te está preocupando o afectando últimamente?"""
+)
 
     if estado.get("fase") == "introduccion":
         estado["fase"] = "esperando_descripcion"
