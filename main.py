@@ -91,17 +91,16 @@ def procesar_mensaje(mensaje, user_id):
             estado["fase"] = "menu_modulos"
             usuarios_estado[user_id] = estado
             return (
-                "¡Genial! Estas son algunas de las habilidades que podés explorar:
+    "¡Genial! Estas son algunas de las habilidades que podés explorar:\n\n"
+    "1. Autoconciencia\n"
+    "2. Autorregulación\n"
+    "3. Conciencia social\n"
+    "4. Confianza\n"
+    "5. Toma de decisiones responsable\n"
+    "6. Habilidades de relacionamiento\n\n"
+    "Escribí el número o el nombre de la habilidad que te interesa."
+)
 
-1. Autoconciencia
-2. Autorregulación
-3. Conciencia social
-4. Confianza
-5. Toma de decisiones responsable
-6. Habilidades de relacionamiento
-
-Escribí el número o el nombre de la habilidad que te interesa."
-            )
         elif texto in ["ayuda", "no sé", "nose"]:
             return "Podés comenzar contándome qué estás sintiendo o elegir una habilidad sobre la que quieras aprender. Decime lo que quieras y yo te guío."
         else:
