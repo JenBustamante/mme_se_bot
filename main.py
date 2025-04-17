@@ -31,7 +31,6 @@ emociones_habilidades = {
     "inseguridad": "confianza"
 }
 
-# Nueva lista de emociones para mejorar la detección
 lista_emociones = list(emociones_habilidades.keys())
 
 descripcion_habilidades = {
@@ -49,21 +48,11 @@ RESPUESTAS_NO = ["no", "no.", "nop", "negativo"]
 SALUDOS_INICIALES = ["hola", "buenas", "buenos días", "buenas tardes", "buenas noches"]
 
 retos_narrativos = {
-    "autorregulación": [
-        "Hoy vamos a enfocarnos en una técnica de respiración consciente..."
-    ],
-    "autoconciencia": [
-        "Hoy vas a escribir en un diario emocional..."
-    ],
-    "toma de decisiones responsable": [
-        "El reto de hoy es una simulación de decisiones..."
-    ],
-    "conciencia social": [
-        "Observá una conversación o interacción..."
-    ],
-    "confianza": [
-        "Anotá tres momentos de tu vida donde lograste algo importante..."
-    ]
+    "autorregulación": ["Hoy vamos a enfocarnos en una técnica de respiración consciente..."],
+    "autoconciencia": ["Hoy vas a escribir en un diario emocional..."],
+    "toma de decisiones responsable": ["El reto de hoy es una simulación de decisiones..."],
+    "conciencia social": ["Observá una conversación o interacción..."],
+    "confianza": ["Anotá tres momentos de tu vida donde lograste algo importante..."]
 }
 
 def detectar_emocion(texto):
@@ -77,79 +66,54 @@ def procesar_mensaje(mensaje, user_id):
     estado = usuarios_estado.get(user_id, {})
 
     if any(s in texto for s in SALUDOS_INICIALES):
-        estado = {}
-        estado["fase"] = "esperando_descripcion"
+        estado = {"fase": "menu_inicio"}
         usuarios_estado[user_id] = estado
         return (
-          "¡Hola! Gracias por estar acá. Me alegra que hayas llegado. Este es un espacio pensado para ayudarte a desarrollar habilidades sociales y emocionales que te permitan afrontar los desafíos de la vida con más claridad y bienestar.\n\n"
-            "Quiero aclararte que esto no es ni pretende ser terapia.\n\n"
-            "Lo que vas a encontrar acá es ciencia: herramientas prácticas basadas en teoría cognitivo-conductual, el enfoque CASEL y buenas prácticas de enseñanza socioemocional. Todas ellas están basadas en evidencia y que han demostrado ser efectivas para ayudar a las personas a sentirse mejor y superar retos.\n\n"
-            "¿Te gustaría comenzar contándome qué te está preocupando o afectando últimamente?"
+            "¡Hola! Qué alegría que estés aquí.\n\n"
+            "Este espacio fue creado especialmente para acompañarte a afrontar los desafíos de la vida y ayudarte a desarrollar habilidades sociales y emocionales que te permitan sentirte mejor, tomar decisiones con más claridad y construir relaciones más sanas.\n\n"
+            "Quiero contarte algo importante: esto NO es terapia, ni pretende serlo, pero sí vas a encontrar herramientas prácticas y confiables, basadas en:\n\n"
+            "• *Teoría Cognitivo-Conductual (TCC)*: una metodología respaldada por la ciencia que conecta tus pensamientos, emociones y acciones.\n"
+            "• *Aprendizaje Social y Emocional (SEL)*: un enfoque educativo desarrollado por CASEL que fortalece tu bienestar emocional.\n"
+            "• *Buenas prácticas y evidencia científica*: nada de frases vacías ni promesas mágicas; solo ejercicios y reflexiones que funcionan de verdad.\n\n"
+            "¿Cómo funciona MME?\n\n"
+            "Puedes contarme qué estás sintiendo o qué te preocupa, y te devolveré ejercicios prácticos, y con posibilidad de seguimiento diario, para ayudarte a desarrollar la habilidad socioemocional que necesitas para afrontar esa situación.\n\n"
+            "También puedes explorar habilidades clave como autoconciencia, regulación emocional, empatía, relaciones y toma de decisiones.\n\n"
+            "Si no sabes por dónde empezar, solo escribí *ayuda* o *no sé*, y te guiaré paso a paso.\n\n"
+            "¿Cómo querés comenzar?\n1. Escribir una situación que estás viviendo\n2. Acceder a un módulo de aprendizaje sobre habilidades socioemocionales"
         )
 
-    if estado.get("fase") == "esperando_descripcion":
-        estado["mensaje_usuario"] = mensaje
-        estado.setdefault("historial", []).append(mensaje)
-        estado["fase"] = "indagacion_1"
-        usuarios_estado[user_id] = estado
-        return "Gracias por compartirlo. ¿Qué es lo más difícil de esta situación para vos?"
-
-    if estado.get("fase") == "indagacion_1":
-        estado["indagacion_1"] = mensaje
-        estado.setdefault("historial", []).append(mensaje)
-        estado["fase"] = "indagacion_2"
-        usuarios_estado[user_id] = estado
-        return "¿Y cómo reacciona tu cuerpo o tu mente cuando estás en esa situación?"
-
-    if estado.get("fase") == "indagacion_2":
-        estado["indagacion_2"] = mensaje
-        estado.setdefault("historial", []).append(mensaje)
-        texto_total = " ".join(estado.get("historial", []))
-        emociones_detectadas = detectar_emocion(texto_total)
-        opciones = "\n".join([f"- {e}" for e in emociones_detectadas])
-        estado["fase"] = "emocion_confirmada"
-        estado["emociones_opciones"] = emociones_detectadas
-        usuarios_estado[user_id] = estado
-        return (
-            f"Gracias por contarme más. Por lo que me compartiste, parece que hay varias emociones en juego.\n\n"
-            f"Estas podrían ser algunas de ellas:\n{opciones}\n\n"
-            "¿Te sentís identificado con alguna de estas? Si es así, escribila tal como aparece en la lista."
-        )
-
-    if estado.get("fase") == "emocion_confirmada":
-        if texto in estado.get("emociones_opciones", []):
-            emocion_detectada = texto
-            habilidad = emociones_habilidades[emocion_detectada]
-            descripcion = descripcion_habilidades.get(habilidad, "una habilidad clave para tu bienestar emocional")
-            estado["habilidad"] = habilidad
-            estado["fase"] = "aceptar_trabajo"
-            usuarios_estado[user_id] = estado
-            return (
-                f"Gracias por compartir eso. Entonces podría ser que estés sintiendo *{emocion_detectada}*.\n"
-                f"Para trabajar esa emoción, podemos enfocarnos en desarrollar tu habilidad de *{habilidad}*, que significa {descripcion}.\n\n"
-                "¿Te gustaría que exploremos esa habilidad juntos? (sí/no)"
-            )
-        else:
-            return "No encontré esa emoción en la lista anterior. ¿Podrías escribirla exactamente como aparecía?"
-
-    if estado.get("fase") == "aceptar_trabajo":
-        if texto in RESPUESTAS_SI:
-            habilidad = estado["habilidad"]
-            reto = retos_narrativos.get(habilidad, ["Vamos a empezar con pequeños pasos."])[0]
-            estado["fase"] = "reto_entregado"
-            usuarios_estado[user_id] = estado
-            return (
-                f"Perfecto. Vamos a comenzar a trabajar en *{habilidad}*.\n\n"
-                f"Tu primer reto es el siguiente:\n\n"
-                f"{reto}\n\n"
-                "¿Querés que mañana te recuerde cómo te fue con este reto?"
-            )
-        elif texto in RESPUESTAS_NO:
+    if estado.get("fase") == "menu_inicio":
+        if "1" in texto:
             estado["fase"] = "esperando_descripcion"
             usuarios_estado[user_id] = estado
-            return "Entiendo. Si querés contarme más sobre lo que te pasa, acá estoy."
+            return "Perfecto, contame qué te está preocupando o afectando últimamente."
+        elif "2" in texto:
+            estado["fase"] = "menu_modulos"
+            usuarios_estado[user_id] = estado
+            return (
+                "¡Genial! Estas son algunas de las habilidades que podés explorar:
+
+1. Autoconciencia
+2. Autorregulación
+3. Conciencia social
+4. Confianza
+5. Toma de decisiones responsable
+6. Habilidades de relacionamiento
+
+Escribí el número o el nombre de la habilidad que te interesa."
+            )
+        elif texto in ["ayuda", "no sé", "nose"]:
+            return "Podés comenzar contándome qué estás sintiendo o elegir una habilidad sobre la que quieras aprender. Decime lo que quieras y yo te guío."
         else:
-            return "¿Querés que trabajemos esa habilidad? Respondé sí o no."
+            return "¿Querés empezar por una situación personal (1) o por un módulo de aprendizaje (2)? Escribí 1 o 2."
+        elif "2" in texto:
+            estado["fase"] = "menu_modulos"
+            usuarios_estado[user_id] = estado
+            return "¡Genial! ¿Sobre qué habilidad te gustaría aprender más? (Por ejemplo: autorregulación, empatía, confianza, etc.)"
+        elif texto in ["ayuda", "no sé", "nose"]:
+            return "Podés comenzar contándome qué estás sintiendo o elegir una habilidad sobre la que quieras aprender. Decime lo que quieras y yo te guío."
+        else:
+            return "¿Querés empezar por una situación personal (1) o por un módulo de aprendizaje (2)? Escribí 1 o 2."
 
     return "Estoy procesando lo que me compartiste. Gracias por tu paciencia."
 
