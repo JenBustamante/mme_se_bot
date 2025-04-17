@@ -36,6 +36,19 @@ def procesar_mensaje(mensaje, user_id):
 
     if estado.get("fase") == "menu_inicio":
         if "2" in texto:
+            estado["fase"] = "seleccion_habilidad"
+            usuarios_estado[user_id] = estado
+            return (
+                "Genial. ¿Qué habilidad te gustaría desarrollar?\n\n"
+                "1. Autoconciencia\n"
+                "2. Autorregulación\n"
+                "3. Empatía\n"
+                "4. Habilidades de relación\n"
+                "5. Toma de decisiones responsable"
+            )
+
+    if estado.get("fase") == "seleccion_habilidad":
+        if "1" in texto:
             estado["fase"] = "modulo_autoconciencia_inicio"
             usuarios_estado[user_id] = estado
             return (
