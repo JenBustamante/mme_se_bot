@@ -79,7 +79,7 @@ def procesar_mensaje(mensaje, user_id):
             "Puedes contarme qué estás sintiendo o qué te preocupa, y te devolveré ejercicios prácticos, y con posibilidad de seguimiento diario, para ayudarte a desarrollar la habilidad socioemocional que necesitas para afrontar esa situación.\n\n"
             "También puedes explorar habilidades clave como autoconciencia, regulación emocional, empatía, relaciones y toma de decisiones.\n\n"
             "Si no sabes por dónde empezar, solo escribí *ayuda* o *no sé*, y te guiaré paso a paso.\n\n"
-            "¿Cómo querés comenzar?\n1. Escribir una situación que estás viviendo\n2. Acceder a un módulo de aprendizaje sobre habilidades socioemocionales"
+            "¿Cómo querés comenzar?\n1. Escribir una situación que estás viviendo\n2. Quiero aprender una habilidad"
         )
 
     if estado.get("fase") == "menu_inicio":
@@ -91,24 +91,15 @@ def procesar_mensaje(mensaje, user_id):
             estado["fase"] = "menu_modulos"
             usuarios_estado[user_id] = estado
             return (
-    "¡Genial! Estas son algunas de las habilidades que podés explorar:\n\n"
-    "1. Autoconciencia\n"
-    "2. Autorregulación\n"
-    "3. Conciencia social\n"
-    "4. Confianza\n"
-    "5. Toma de decisiones responsable\n"
-    "6. Habilidades de relacionamiento\n\n"
-    "Escribí el número o el nombre de la habilidad que te interesa."
-)
-
-        elif texto in ["ayuda", "no sé", "nose"]:
-            return "Podés comenzar contándome qué estás sintiendo o elegir una habilidad sobre la que quieras aprender. Decime lo que quieras y yo te guío."
-        else:
-            return "¿Querés empezar por una situación personal (1) o por un módulo de aprendizaje (2)? Escribí 1 o 2."
-        elif "2" in texto:
-            estado["fase"] = "menu_modulos"
-            usuarios_estado[user_id] = estado
-            return "¡Genial! ¿Sobre qué habilidad te gustaría aprender más? (Por ejemplo: autorregulación, empatía, confianza, etc.)"
+                "¡Genial! Estas son algunas de las habilidades que podés explorar:\n\n"
+                "1. Autoconciencia\n"
+                "2. Autorregulación\n"
+                "3. Conciencia social\n"
+                "4. Confianza\n"
+                "5. Toma de decisiones responsable\n"
+                "6. Habilidades de relacionamiento\n\n"
+                "Escribí el número o el nombre de la habilidad que te interesa."
+            )
         elif texto in ["ayuda", "no sé", "nose"]:
             return "Podés comenzar contándome qué estás sintiendo o elegir una habilidad sobre la que quieras aprender. Decime lo que quieras y yo te guío."
         else:
