@@ -48,105 +48,106 @@ def procesar_mensaje(mensaje, user_id):
             )
 
     if estado.get("fase") == "seleccion_habilidad":
-        if "1" in texto:
-            estado["fase"] = "modulo_autoconciencia_inicio"
+        if "2" in texto:
+            estado["fase"] = "modulo_autorregulacion_intro"
             usuarios_estado[user_id] = estado
             return (
-                "Vamos a trabajar juntos en desarrollar tu *autoconciencia*. Eso significa aprender a identificar lo que estás sintiendo, pensando y por qué.\n"
-                "Esto te va a ayudar a tomar mejores decisiones, entenderte mejor y sentirte más en control de tu vida.\n\n"
-                "¿Te gustaría comenzar con una pregunta para reflexionar?\n\n"
-                "1. Sí, dale.\n2. Prefiero seguir sin test."
+                "Ahora vamos a trabajar en tu *autorregulación emocional*, que es la capacidad de manejar lo que sentís sin que eso te desborde.\n"
+                "No se trata de evitar las emociones, sino de reconocerlas y elegir cómo responder en lugar de reaccionar automáticamente.\n\n"
+                "¿Te ha pasado últimamente que una emoción te hizo decir o hacer algo de lo que después te arrepentiste?\n\n"
+                "1. Sí\n2. No\n3. No estoy seguro/a"
             )
 
-    if estado.get("fase") == "modulo_autoconciencia_inicio":
-        if "1" in texto:
-            estado["fase"] = "microtest_emocional"
+    if estado.get("fase") == "modulo_autorregulacion_intro":
+        if texto in ["1", "3"]:
+            estado["fase"] = "autorregulacion_exp"
             usuarios_estado[user_id] = estado
             return (
-                "En este momento, ¿podés identificar cómo te sentís?\n\n"
-                "1. Triste\n2. Ansioso/a\n3. Cansado/a\n4. Enojado/a\n5. Bien\n6. No sé / No puedo ponerlo en palabras"
+                "Gracias por compartirlo. Eso nos pasa a todos, y lo importante es que se puede trabajar. Vamos a ver cómo.\n\n"
+                "Las emociones fuertes como la ira, la ansiedad o la tristeza nos quieren decir algo, pero si no las regulamos, pueden tomar el control.\n"
+                "La autorregulación es como un *semáforo interno*: nos permite poner una pausa entre lo que sentimos y lo que hacemos.\n\n"
+                "Te presento una herramienta sencilla y poderosa: el *Semáforo emocional*.\n\n"
+                "🔴 Rojo: Alto. Pausá. ¿Qué estás sintiendo?\n"
+                "🟡 Amarillo: Pensá. ¿Qué pasó? ¿Qué opciones tenés?\n"
+                "🟢 Verde: Actuá. Elegí cómo responder de forma más saludable.\n\n"
+                "¿Querés probar esta herramienta con algo que te haya pasado recientemente?\n1. Sí\n2. No por ahora"
+            )
+        elif texto == "2":
+            estado["fase"] = "autorregulacion_exp"
+            usuarios_estado[user_id] = estado
+            return (
+                "Gracias. Vamos a explorar juntos cómo manejar emociones intensas.\n\n"
+                "Las emociones fuertes como la ira, la ansiedad o la tristeza nos quieren decir algo, pero si no las regulamos, pueden tomar el control.\n"
+                "La autorregulación es como un *semáforo interno*: nos permite poner una pausa entre lo que sentimos y lo que hacemos.\n\n"
+                "Te presento una herramienta sencilla y poderosa: el *Semáforo emocional*.\n\n"
+                "🔴 Rojo: Alto. Pausá. ¿Qué estás sintiendo?\n"
+                "🟡 Amarillo: Pensá. ¿Qué pasó? ¿Qué opciones tenés?\n"
+                "🟢 Verde: Actuá. Elegí cómo responder de forma más saludable.\n\n"
+                "¿Querés probar esta herramienta con algo que te haya pasado recientemente?\n1. Sí\n2. No por ahora"
+            )
+
+    if estado.get("fase") == "autorregulacion_exp":
+        if "1" in texto:
+            estado["fase"] = "autorregulacion_ejercicio"
+            usuarios_estado[user_id] = estado
+            return "Contame una situación reciente donde sentiste una emoción intensa."
+        else:
+            estado["fase"] = "autorregulacion_tecnica"
+            usuarios_estado[user_id] = estado
+            return (
+                "Durante el día de hoy, te invito a que observes si podés identificar alguna emoción fuerte justo cuando aparece.\n"
+                "Intentá ponerle un nombre y elegir una forma diferente de responder. Aunque no lo logres, el solo intento ya es parte del aprendizaje.\n\n"
+                "¿Querés aprender una técnica rápida para calmarte cuando estés muy activado emocionalmente?\n1. Respiración 4-7-8\n2. Aterrizaje con 5 sentidos\n3. No por ahora"
+            )
+
+    if estado.get("fase") == "autorregulacion_ejercicio":
+        estado["evento"] = texto
+        estado["fase"] = "autorregulacion_abc"
+        usuarios_estado[user_id] = estado
+        return (
+            "Rojo 🔴: ¿Qué emoción sentiste? ¿Dónde la sentiste en el cuerpo?"
+        )
+
+    if estado.get("fase") == "autorregulacion_abc":
+        estado["fase"] = "autorregulacion_amarillo"
+        usuarios_estado[user_id] = estado
+        return (
+            "Amarillo 🟡: ¿Qué pasó? ¿Qué pensaste? ¿Qué opciones tenías?"
+        )
+
+    if estado.get("fase") == "autorregulacion_amarillo":
+        estado["fase"] = "autorregulacion_verde"
+        usuarios_estado[user_id] = estado
+        return (
+            "Verde 🟢: ¿Qué hiciste finalmente? ¿Te sirvió esa reacción?\n\nMuy bien. Solo el hecho de detenerte a pensar ya es un gran paso para regular lo que sentís.\n\n"
+            "¿Querés aprender una técnica rápida para calmarte cuando estés muy activado emocionalmente?\n1. Respiración 4-7-8\n2. Aterrizaje con 5 sentidos\n3. No por ahora"
+        )
+
+    if estado.get("fase") == "autorregulacion_tecnica" or estado.get("fase") == "autorregulacion_verde":
+        if "1" in texto:
+            estado["fase"] = "autorregulacion_cierre"
+            usuarios_estado[user_id] = estado
+            return (
+                "Inhalá por 4 segundos... Mantené por 7... Exhalá por 8... Repetí 3 veces. Esta técnica ayuda a calmar el sistema nervioso rápidamente."
             )
         elif "2" in texto:
-            estado["fase"] = "explicacion_autoconciencia"
+            estado["fase"] = "autorregulacion_cierre"
             usuarios_estado[user_id] = estado
             return (
-                "Perfecto. Entonces vamos a seguir directo a conocer más sobre la habilidad."
-            )
-
-    if estado.get("fase") == "microtest_emocional":
-        if "6" in texto:
-            estado["fase"] = "explicacion_autoconciencia"
-            usuarios_estado[user_id] = estado
-            return (
-                "No te preocupes, eso también es una forma válida de sentir. A veces solo necesitamos un poco de ayuda para entender lo que pasa por dentro. Vamos paso a paso."
+                "Decí en voz alta o pensá:\n5 cosas que ves,\n4 que podés tocar,\n3 que podés oír,\n2 que podés oler,\n1 que podés saborear.\nEs un ejercicio de conexión con el presente."
             )
         else:
-            estado["fase"] = "explicacion_autoconciencia"
+            estado["fase"] = "autorregulacion_cierre"
             usuarios_estado[user_id] = estado
-            return (
-                "Gracias por compartir cómo te sentís. Sigamos."
-            )
+            return "Perfecto, seguimos."
 
-    if estado.get("fase") == "explicacion_autoconciencia":
-        estado["fase"] = "modelo_abc"
-        usuarios_estado[user_id] = estado
-        return (
-            "La *autoconciencia* es como tener un espejo interior. Nos ayuda a observar nuestras emociones y pensamientos sin juzgarlos.\n"
-            "Cuando no sabemos qué sentimos o por qué reaccionamos de cierta forma, nos cuesta cambiar. Pero si aprendemos a identificar eso, podemos actuar con más claridad y calma.\n\n"
-            "Te voy a mostrar una herramienta que usan mucho los psicólogos: el *modelo ABC*. Sirve para entender qué pasó, qué pensaste y cómo eso te hizo sentir o actuar.\n\n"
-            "A: Acontecimiento – ¿Qué pasó?\n"
-            "B: Pensamiento o creencia – ¿Qué pensaste en ese momento?\n"
-            "C: Consecuencia – ¿Cómo te sentiste o qué hiciste?\n\n"
-            "¿Querés probarlo ahora con algo que te haya pasado?\n1. Sí, quiero probar\n2. No, prefiero seguir sin ejercicio"
-        )
-
-    if estado.get("fase") == "modelo_abc":
-        if "1" in texto:
-            estado["fase"] = "abc_evento"
-            usuarios_estado[user_id] = estado
-            return "Contame algo que te haya pasado hoy o esta semana que te haya hecho sentir algo intenso."
-        else:
-            estado["fase"] = "mision_diaria"
-            usuarios_estado[user_id] = estado
-            return "No hay problema. Podés pasar directo al desafío diario."
-
-    if estado.get("fase") == "abc_evento":
-        estado["evento"] = texto
-        estado["fase"] = "abc_pensamiento"
-        usuarios_estado[user_id] = estado
-        return "¿Qué pensaste justo después de eso?"
-
-    if estado.get("fase") == "abc_pensamiento":
-        estado["pensamiento"] = texto
-        estado["fase"] = "abc_consecuencia"
-        usuarios_estado[user_id] = estado
-        return "¿Y cómo te sentiste o qué hiciste después de ese pensamiento?"
-
-    if estado.get("fase") == "abc_consecuencia":
-        estado["fase"] = "reencuadre"
-        usuarios_estado[user_id] = estado
-        return (
-            "Muchas veces lo que pensamos no es un hecho, sino una interpretación. Vamos a ver si podemos encontrar otra forma de mirar lo que pasó.\n\n"
-            "¿Qué otra explicación podría haber?\n¿Hay algo que contradiga ese pensamiento?\n¿Qué le dirías a un amigo que pensara eso?"
-        )
-
-    if estado.get("fase") == "reencuadre":
-        estado["fase"] = "mision_diaria"
-        usuarios_estado[user_id] = estado
-        return (
-            "Gracias por compartir eso. Vamos con el desafío de hoy.\n\n"
-            "Durante el día de hoy pensá en 2 momentos donde sentiste una emoción fuerte. Cuando eso pase, preguntate:\n"
-            "¿Qué pensé justo antes de sentirme así?\n\n"
-            "Esa práctica diaria es como un músculo que se entrena. ¡Funciona!"
-        )
-
-    if estado.get("fase") == "mision_diaria":
+    if estado.get("fase") == "autorregulacion_cierre":
         estado["fase"] = "fin_modulo"
         usuarios_estado[user_id] = estado
         return (
-            "¡Muy bien! Trabajar en tu autoconciencia es un paso enorme para conocerte y sentirte mejor.\n"
-            "Podés volver a esta herramienta cuando lo necesites, o seguir con otro módulo. Estoy acá para acompañarte.\n\n"
-            "¿Qué te gustaría hacer ahora?\n1. Volver al inicio\n2. Ir al módulo de autorregulación\n3. Escribir cómo me siento ahora"
+            "¡Bien hecho! Regular tus emociones no significa controlarlas al 100%, sino aprender a navegar por ellas sin que te arrastren.\n"
+            "Podés practicar esto cada día, y vas a ver cómo mejora tu bienestar y tus relaciones.\n\n"
+            "¿Qué te gustaría hacer ahora?\n1. Volver al inicio\n2. Ir al módulo de conciencia social\n3. Compartir cómo me sentí hoy"
         )
 
     return "Estoy procesando lo que me compartiste. Gracias por tu paciencia."
