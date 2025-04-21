@@ -2,7 +2,8 @@
 import os
 from flask import Flask, request
 import telegram
-from telegram.ext import Dispatcher, MessageHandler, Filters
+from telegram import Update
+from telegram.ext import Dispatcher, MessageHandler, Filters, CallbackContext
 from datetime import datetime
 
 # Configuración del bot
@@ -67,21 +68,24 @@ def procesar_mensaje(mensaje, user_id):
         estado["fase"] = "preguntas_emocion_1"
         usuarios_estado[user_id] = estado
 
-        # Detección básica de emociones (ampliada con género, sinónimos y raíz de la palabra emoción)
+        # Detección mejorada de emociones
         emociones_regex = {
-            "ansiedad": r"ansios[oa]|ansiedad|nervios[oa]|preocupad[oa]|inquiet[oa]|agobiad[oa]|intranquil[oa]|temeros[oa]",
-            "tristeza": r"trist[ea]|tristeza|deprimid[oa]|vac[ií]([o|a])|melanc[oó]lic[oa]|apagad[oa]|nostálgic[oa]|pesimista",
-            "frustración": r"frustrad[oa]|frustración|impotente|bloquead[oa]|incapaz|rendid[oa]|desbordad[oa]",
-            "enojo": r"enoj[oa]|enojo|molest[oa]|rabia|furios[oa]|col[eé]ric[oa]|bronca|impotencia|irritad[oa]",
-            "soledad": r"sol[oa]|soledad|aislad[oa]|invisible|abandonad[oa]|desconectad[oa]|ignorado|apartad[oa]",
-            "inseguridad": r"insegur[oa]|inseguridad|no soy capaz|valgo poco|dud[oa] de m[ií]|me siento menos|me comparo|soy inferior",
-            "estrés": r"estr[eé]s|estresad[oa]|sobrecargad[oa]|agotad[oa]|saturad[oa]|acelerad[oa]|presionad[oa]"
+            "ansiedad": r"\b(ansios[oa]|ansiedad|nervios[oa]|preocupad[oa]|inquiet[oa]|agobiad[oa]|intranquil[oa]|temeros[oa]|no paro de pensar|me cuesta respirar|me sudan las manos|alerta todo el tiempo|lat[ie] fuerte|pienso que va a pasar algo malo)\b",
+            "tristeza": r"\b(trist[ea]|tristeza|deprimid[oa]|vac[ií]([o|a])|melanc[oó]lic[oa]|apagad[oa]|nostálgic[oa]|pesimista|desmotivad[oa]|sin ganas|vac[ií]o|desconectad[oa]|sin sentido|quiero llorar)\b",
+            "frustración": r"\b(frustrad[oa]|frustración|impotente|bloquead[oa]|incapaz|rendid[oa]|desbordad[oa]|me esfuerzo y no pasa nada|nunca es suficiente|todo me sale mal|no avanzo|estancado|todo se complica)\b",
+            "enojo": r"\b(enoj[oa]|enojo|molest[oa]|rabia|furios[oa]|col[eé]ric[oa]|bronca|impotencia|irritad[oa]|exploto|todo me irrita|grito sin querer|mecha corta|provocan|reacciono mal)\b",
+            "soledad": r"\b(sol[oa]|soledad|aislad[oa]|invisible|abandonad[oa]|desconectad[oa]|ignorado|apartad[oa]|me siento sola|me siento solo|no le importo a nadie|nadie me escribe|no tengo con quién hablar|siento que no pertenezco)\b",
+            "inseguridad": r"\b(insegur[oa]|inseguridad|no soy capaz|valgo poco|dud[oa] de m[ií]|me siento menos|me comparo|soy inferior|no soy tan buen[oa]|no sirvo para esto|no estoy a la altura|me siento incapaz|no soy suficiente|creo que no soy suficiente|me cuesta decir que no|no puedo decir que no)\b",
+            "estrés": r"\b(estr[eé]s|estresad[oa]|sobrecargad[oa]|agotad[oa]|saturad[oa]|acelerad[oa]|presionad[oa]|no tengo tiempo|me duele la cabeza del cansancio|modo automático|me sobrepasa todo|mil cosas en la cabeza|no paro|estresado|estresada)\b"
         }
 
+        emociones_detectadas = []
         for emocion, patron in emociones_regex.items():
             if re.search(patron, texto):
-                estado["emocion_detectada"] = emocion
-                break
+                emociones_detectadas.append(emocion)
+
+        if emociones_detectadas:
+            estado["emocion_detectada"] = ", ".join(emociones_detectadas)
 
         return "Gracias por compartirlo. Me gustaría entender un poco mejor lo que sentís. ¿Qué situaciones suelen disparar esa emoción en vos?"
 
