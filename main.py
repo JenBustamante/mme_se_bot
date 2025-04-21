@@ -158,10 +158,10 @@ def procesar_mensaje(mensaje, user_id):
             }
             descripcion = descripcion_emocion.get(emocion, "una emoción difícil de identificar")
 
-        estado["fase"] = "emocion_confirmada"
+                estado["fase"] = "emocion_confirmada"
         usuarios_estado[user_id] = estado
 
-                return (
+        return (
             f"Por lo que me contás, puede que estés sintiendo *{emocion}*, que es {descripcion}.\n"
             "¿Te hace sentido eso? Si querés, podemos trabajarla desarrollando una habilidad que te ayude. ¿Querés empezar por ahí? (sí/no)"
         )
