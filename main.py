@@ -97,13 +97,13 @@ def procesar_mensaje(mensaje, user_id):
         usuarios_estado[user_id] = estado
 
         respuestas = {
-            "ansiedad": "La ansiedad puede sentirse como un nudo en el pecho que aparece justo cuando más necesitamos claridad. ¿Has intentado alguna estrategia para calmarte en esos momentos?",
-            "tristeza": "A veces, cuando estamos tristes, cuesta encontrar algo que nos alivie. ¿Qué hacés normalmente cuando te sentís así?",
-            "frustración": "La frustración puede agotar nuestra energía emocional. ¿Qué hacés cuando sentís que nada sale como querés?",
-            "enojo": "Después de una explosión de enojo, muchas veces nos queda culpa o duda. ¿Cómo reaccionás normalmente cuando te sentís así?",
-            "soledad": "La soledad prolongada puede hacer que incluso nuestras relaciones más cercanas se sientan lejanas. ¿Hay personas con las que te gustaría conectar más pero no sabés cómo?",
-            "inseguridad": "La inseguridad a veces se mete silenciosamente. ¿Qué pensamientos aparecen cuando te sentís inseguro o insegura?",
-            "estrés": "Muchas veces el estrés aparece cuando sentimos que tenemos que encargarnos de todo al mismo tiempo. ¿Últimamente has notado que tu cuerpo o tu mente te están pidiendo una pausa?"
+            "ansiedad": "Hay emociones que pueden sentirse como un nudo en el pecho que aparece justo cuando más necesitamos claridad. ¿Has intentado alguna estrategia para calmarte en esos momentos?",
+            "tristeza": "A veces, cuando estamos desanimados, cuesta encontrar algo que nos alivie. ¿Qué hacés normalmente cuando te sentís así?",
+            "frustración": "Cuando queremos algo que no se da como pensamos, nuestra energía emocional se ve afectada y puede agotarse. ¿Qué hacés cuando sentís que nada sale como querés?",
+            "enojo": "Después de una explosión de emociones desagradables, muchas veces nos queda culpa o duda. ¿Cómo reaccionás normalmente cuando te sentís así?",
+            "soledad": "Sentirnos aislados, o hacerlo por cuenta propia puede hacer que incluso nuestras relaciones más cercanas se sientan lejanas. ¿Hay personas con las que te gustaría conectar más pero no sabés cómo?",
+            "inseguridad": "Todos tenemos cosas que no nos hacen sentir seguros, y a veces ese sentimiento se mete silenciosamente. ¿Qué pensamientos aparecen cuando te sentís de esa forma?",
+            "estrés": "Muchas veces sentimos que tenemos que encargarnos de todo al mismo tiempo y no sabemos como manejar algunas situaciones. ¿Últimamente has notado que tu cuerpo o tu mente te están pidiendo una pausa?"
         }
 
         return respuestas.get(emocion, "¿Podés contarme un poco más sobre eso?")
