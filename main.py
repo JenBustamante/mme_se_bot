@@ -132,7 +132,7 @@ def procesar_mensaje(mensaje, user_id):
                 emocion = "emociones combinadas"
                 descripcion = "una combinación de emociones que pueden estar interactuando entre sí y dificultando encontrar claridad."
 "una combinación de preocupación constante y una sensación de sobrecarga que puede hacer que todo parezca demasiado."
-        else:
+            else:
             estado["fase"] = "emocion_confirmada"
             usuarios_estado[user_id] = estado
             descripcion_emocion = {
