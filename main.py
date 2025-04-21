@@ -110,7 +110,7 @@ def procesar_mensaje(mensaje, user_id):
 
         # Validación para detectar múltiples emociones
         posibles_emociones = []
-        if "estrés" in texto or "estresado" in texto or "saturado" in texto:
+        if "estrés" in texto or "estresado" in texto or "saturado" in texto or "desmotivado" in texto:
             posibles_emociones.append("estrés")
         if "ansiedad" in texto or "preocupado" in texto or "nervioso" in texto:
             posibles_emociones.append("ansiedad")
