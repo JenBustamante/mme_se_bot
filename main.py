@@ -18,8 +18,16 @@ usuarios_estado = {}
 
 # Frases que identifican saludos y respuestas comunes
 SALUDOS_INICIALES = ["hola", "buenas", "buenos días", "buenas tardes", "buenas noches"]
-RESPUESTAS_SI = ["sí", "si", "sí.", "si.", "claro", "dale", "quiero", "sí, dale"]
-RESPUESTAS_NO = ["no", "no.", "nop", "prefiero seguir sin test"]
+RESPUESTAS_SI = [
+    "sí", "si", "sí.", "si.", "claro", "dale", "quiero", "sí, dale",
+    "sí quiero", "me gustaría", "por supuesto", "de una", "sí quiero hacerlo",
+    "sí quiero probar", "obvio", "vale", "está bien"
+]
+RESPUESTAS_NO = [
+    "no", "no.", "nop", "prefiero seguir sin test",
+    "no gracias", "mejor no", "no por ahora", "prefiero que no",
+    "no quiero", "quizá después", "no estoy seguro", "no estoy segura"
+]
 
 import re
 import random
@@ -59,26 +67,21 @@ def procesar_mensaje(mensaje, user_id):
         estado["fase"] = "preguntas_emocion_1"
         usuarios_estado[user_id] = estado
 
-        # Detección básica de emociones
-        if re.search(r"ansioso|ansiedad|nervioso", texto):
+        # Detección básica de emociones (ampliada con género, sinónimos y raíz de la palabra emoción)
+        if re.search(r"ansios[oa]|ansiedad|nervios[oa]|preocupad[oa]|inquiet[oa]|ansiosidad", texto):
             estado["emocion_detectada"] = "ansiedad"
-        elif re.search(r"triste|deprimido|vacío", texto):
+        elif re.search(r"trist[ea]|tristeza|deprimid[oa]|vac[ií]([o|a])|melanc[oó]lic[oa]|apagad[oa]", texto):
             estado["emocion_detectada"] = "tristeza"
-        elif re.search(r"frustrado|impotente|bloqueado", texto):
+        elif re.search(r"frustrad[oa]|frustración|impotente|bloquead[oa]|incapaz|rendid[oa]", texto):
             estado["emocion_detectada"] = "frustración"
-        elif re.search(r"enojo|molesto|rabia|impotencia", texto):
+        elif re.search(r"enoj[oa]|enojo|molest[oa]|rabia|furios[oa]|coleric[oa]|bronca|impotencia", texto):
             estado["emocion_detectada"] = "enojo"
-        elif re.search(r"solo|aislado|invisible", texto):
+        elif re.search(r"sol[oa]|soledad|aislad[oa]|invisible|abandonad[oa]|desconectad[oa]", texto):
             estado["emocion_detectada"] = "soledad"
-        elif re.search(r"inseguro|no soy capaz|valgo poco", texto):
+        elif re.search(r"insegur[oa]|inseguridad|no soy capaz|valgo poco|dud[oa] de m[ií]|me siento menos", texto):
             estado["emocion_detectada"] = "inseguridad"
-        elif re.search(r"estresado|sobrecargado", texto):
+        elif re.search(r"estrés|estresad[oa]|sobrecargad[oa]|agotad[oa]|saturad[oa]|acelerad[oa]", texto):
             estado["emocion_detectada"] = "estrés"
-        else:
-            estado["emocion_detectada"] = "indefinida"
-            return "Gracias por compartir eso. Me gustaría entender un poco más lo que estás sintiendo. ¿Podés contarme con más detalle qué fue lo que te hizo sentir así?"
-
-        # Si se detectó alguna emoción, pasa a la siguiente fase
         return "Gracias por compartirlo. Me gustaría entender un poco mejor lo que sentís. ¿Qué situaciones suelen disparar esa emoción en vos?"
 
     # Primera pregunta de profundización emocional
