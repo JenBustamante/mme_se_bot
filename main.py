@@ -75,7 +75,7 @@ def procesar_mensaje(mensaje, user_id):
             "frustración": r"\b(frustrad[oa]|frustración|impotente|bloquead[oa]|incapaz|rendid[oa]|desbordad[oa]|me esfuerzo y no pasa nada|nunca es suficiente|todo me sale mal|no avanzo|estancado|todo se complica)\b",
             "enojo": r"\b(enoj[oa]|enojo|molest[oa]|rabia|furios[oa]|col[eé]ric[oa]|bronca|impotencia|irritad[oa]|exploto|todo me irrita|grito sin querer|mecha corta|provocan|reacciono mal)\b",
             "soledad": r"\b(sol[oa]|soledad|aislad[oa]|invisible|abandonad[oa]|desconectad[oa]|ignorado|apartad[oa]|me siento sola|me siento solo|no le importo a nadie|nadie me escribe|no tengo con quién hablar|siento que no pertenezco)\b",
-            "inseguridad": r"\b(insegur[oa]|inseguridad|no soy capaz|valgo poco|dud[oa] de m[ií]|me siento menos|me comparo|soy inferior|no soy tan buen[oa]|no sirvo para esto|no estoy a la altura|me siento incapaz|no soy suficiente|creo que no soy suficiente|me cuesta decir que no|no puedo decir que no)\b",
+            "inseguridad": r"\b(insegur[oa]|inseguridad|no soy capaz|valgo poco|dud[oa] de m[ií]|me siento menos|me comparo|soy inferior|no soy tan buen[oa]|no sirvo para esto|no estoy a la altura|me siento incapaz|siento que no hago nada bien|no soy suficiente|creo que no soy suficiente|me cuesta decir que no|no puedo decir que no)\b",
             "estrés": r"\b(estr[eé]s|estresad[oa]|sobrecargad[oa]|agotad[oa]|saturad[oa]|acelerad[oa]|presionad[oa]|no tengo tiempo|me duele la cabeza del cansancio|modo automático|me sobrepasa todo|mil cosas en la cabeza|no paro|estresado|estresada)\b"
         }
 
