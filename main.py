@@ -98,7 +98,7 @@ def procesar_mensaje(mensaje, user_id):
             "enojo": "Después de una explosión de enojo, muchas veces nos queda culpa o duda. ¿Cómo reaccionás normalmente cuando te sentís así?",
             "soledad": "La soledad prolongada puede hacer que incluso nuestras relaciones más cercanas se sientan lejanas. ¿Hay personas con las que te gustaría conectar más pero no sabés cómo?",
             "inseguridad": "La inseguridad a veces se mete silenciosamente. ¿Qué pensamientos aparecen cuando te sentís inseguro o insegura?",
-            "estrés": "El estrés nos empuja a seguir incluso cuando nuestro cuerpo nos pide una pausa. ¿Qué haces para aliviarlo últimamente?"
+            "estrés": "Muchas veces el estrés aparece cuando sentimos que tenemos que encargarnos de todo al mismo tiempo. ¿Últimamente has notado que tu cuerpo o tu mente te están pidiendo una pausa?"
         }
 
         return respuestas.get(emocion, "¿Podés contarme un poco más sobre eso?")
@@ -107,10 +107,53 @@ def procesar_mensaje(mensaje, user_id):
     if estado.get("fase") == "preguntas_emocion_2":
         estado["respuesta2"] = texto
         emocion = estado.get("emocion_detectada")
+
+        # Validación para detectar múltiples emociones
+        posibles_emociones = []
+        if "estrés" in texto or "estresado" in texto or "saturado" in texto:
+            posibles_emociones.append("estrés")
+        if "ansiedad" in texto or "preocupado" in texto or "nervioso" in texto:
+            posibles_emociones.append("ansiedad")
+
+        if len(posibles_emociones) > 1:
+            if set(posibles_emociones) == {"ansiedad", "estrés"}:
+                emocion = "una mezcla de ansiedad y estrés"
+                descripcion = "una combinación de preocupación constante y una sensación de sobrecarga que puede hacer que todo parezca demasiado."
+            elif set(posibles_emociones) == {"frustración", "tristeza"}:
+                emocion = "una mezcla de frustración y tristeza"
+                descripcion = "una mezcla entre el desánimo por lo que no salió como esperabas y el cansancio emocional que eso genera."
+            elif set(posibles_emociones) == {"enojo", "inseguridad"}:
+                emocion = "una mezcla de enojo e inseguridad"
+                descripcion = "puede ser que estés sintiendo una tensión entre la frustración interna y la duda sobre vos mismo, algo muy común cuando sentimos que no nos valoran."
+            elif set(posibles_emociones) == {"soledad", "ansiedad"}:
+                emocion = "una mezcla de soledad y ansiedad"
+                descripcion = "cuando sentimos que estamos solos con nuestras preocupaciones, es natural que la ansiedad crezca."
+            else:
+                emocion = "emociones combinadas"
+                descripcion = "una combinación de emociones que pueden estar interactuando entre sí y dificultando encontrar claridad."
+"una combinación de preocupación constante y una sensación de sobrecarga que puede hacer que todo parezca demasiado."
+        else:
+            estado["fase"] = "emocion_confirmada"
+            usuarios_estado[user_id] = estado
+            descripcion_emocion = {
+                "ansiedad": "una emoción que suele sentirse como un nudo en el pecho, acompañada de pensamientos acelerados o preocupación constante.",
+                "tristeza": "una sensación de vacío o desánimo que puede venir acompañada de ganas de aislarse o llorar sin razón aparente.",
+                "frustración": "una emoción que aparece cuando sentimos que nuestros esfuerzos no tienen resultados, lo que genera tensión o ganas de rendirse.",
+                "enojo": "una respuesta emocional intensa ante algo que percibimos como injusto o irritante, y que a veces puede salir en forma de gritos o enojo acumulado.",
+                "soledad": "una sensación de desconexión o falta de compañía significativa, que puede doler incluso estando rodeado de gente.",
+                "inseguridad": "una percepción interna de no ser suficiente, de dudar de uno mismo o de sentirse constantemente comparado con los demás.",
+                "estrés": "una sobrecarga física o mental, como si todo fuera demasiado al mismo tiempo y no pudiéramos parar."
+            }
+            descripcion = descripcion_emocion.get(emocion, "una emoción difícil de identificar")
+
         estado["fase"] = "emocion_confirmada"
         usuarios_estado[user_id] = estado
 
-        return f"Por lo que me contás, puede que estés sintiendo *{emocion}*. ¿Te hace sentido eso? Si querés, podemos trabajarla desarrollando una habilidad que te ayude. ¿Querés empezar por ahí? (sí/no)"
+        return (
+            f"Por lo que me contás, puede que estés sintiendo *{emocion}*, que es {descripcion}
+"
+            f"¿Te hace sentido eso? Si querés, podemos trabajarla desarrollando una habilidad que te ayude. ¿Querés empezar por ahí? (sí/no)"
+        )
 
     return "Estoy procesando lo que me compartiste. Gracias por tu paciencia."
 
