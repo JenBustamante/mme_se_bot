@@ -68,20 +68,21 @@ def procesar_mensaje(mensaje, user_id):
         usuarios_estado[user_id] = estado
 
         # Detección básica de emociones (ampliada con género, sinónimos y raíz de la palabra emoción)
-        if re.search(r"ansios[oa]|ansiedad|nervios[oa]|preocupad[oa]|inquiet[oa]|ansiosidad", texto):
-            estado["emocion_detectada"] = "ansiedad"
-        elif re.search(r"trist[ea]|tristeza|deprimid[oa]|vac[ií]([o|a])|melanc[oó]lic[oa]|apagad[oa]", texto):
-            estado["emocion_detectada"] = "tristeza"
-        elif re.search(r"frustrad[oa]|frustración|impotente|bloquead[oa]|incapaz|rendid[oa]", texto):
-            estado["emocion_detectada"] = "frustración"
-        elif re.search(r"enoj[oa]|enojo|molest[oa]|rabia|furios[oa]|coleric[oa]|bronca|impotencia", texto):
-            estado["emocion_detectada"] = "enojo"
-        elif re.search(r"sol[oa]|soledad|aislad[oa]|invisible|abandonad[oa]|desconectad[oa]", texto):
-            estado["emocion_detectada"] = "soledad"
-        elif re.search(r"insegur[oa]|inseguridad|no soy capaz|valgo poco|dud[oa] de m[ií]|me siento menos", texto):
-            estado["emocion_detectada"] = "inseguridad"
-        elif re.search(r"estrés|estresad[oa]|sobrecargad[oa]|agotad[oa]|saturad[oa]|acelerad[oa]", texto):
-            estado["emocion_detectada"] = "estrés"
+        emociones_regex = {
+            "ansiedad": r"ansios[oa]|ansiedad|nervios[oa]|preocupad[oa]|inquiet[oa]|agobiad[oa]|intranquil[oa]|temeros[oa]",
+            "tristeza": r"trist[ea]|tristeza|deprimid[oa]|vac[ií]([o|a])|melanc[oó]lic[oa]|apagad[oa]|nostálgic[oa]|pesimista",
+            "frustración": r"frustrad[oa]|frustración|impotente|bloquead[oa]|incapaz|rendid[oa]|desbordad[oa]",
+            "enojo": r"enoj[oa]|enojo|molest[oa]|rabia|furios[oa]|col[eé]ric[oa]|bronca|impotencia|irritad[oa]",
+            "soledad": r"sol[oa]|soledad|aislad[oa]|invisible|abandonad[oa]|desconectad[oa]|ignorado|apartad[oa]",
+            "inseguridad": r"insegur[oa]|inseguridad|no soy capaz|valgo poco|dud[oa] de m[ií]|me siento menos|me comparo|soy inferior",
+            "estrés": r"estr[eé]s|estresad[oa]|sobrecargad[oa]|agotad[oa]|saturad[oa]|acelerad[oa]|presionad[oa]"
+        }
+
+        for emocion, patron in emociones_regex.items():
+            if re.search(patron, texto):
+                estado["emocion_detectada"] = emocion
+                break
+
         return "Gracias por compartirlo. Me gustaría entender un poco mejor lo que sentís. ¿Qué situaciones suelen disparar esa emoción en vos?"
 
     # Primera pregunta de profundización emocional
