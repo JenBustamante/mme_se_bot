@@ -114,6 +114,20 @@ def procesar_mensaje(mensaje, user_id):
             posibles_emociones.append("estrés")
         if "ansiedad" in texto or "preocupado" in texto or "nervioso" in texto:
             posibles_emociones.append("ansiedad")
+                    # Si no se detectaron combinaciones nuevas, usar la emoción original detectada
+        if not posibles_emociones:
+            emocion = estado.get("emocion_detectada")
+        descripcion_emocion = {
+            "ansiedad": "una emoción que suele sentirse como un nudo en el pecho, acompañada de pensamientos acelerados o preocupación constante.",
+            "tristeza": "una sensación de vacío o desánimo que puede venir acompañada de ganas de aislarse o llorar sin razón aparente.",
+            "frustración": "una emoción que aparece cuando sentimos que nuestros esfuerzos no tienen resultados, lo que genera tensión o ganas de rendirse.",
+            "enojo": "una respuesta emocional intensa ante algo que percibimos como injusto o irritante, y que a veces puede salir en forma de gritos o enojo acumulado.",
+            "soledad": "una sensación de desconexión o falta de compañía significativa, que puede doler incluso estando rodeado de gente.",
+            "inseguridad": "una percepción interna de no ser suficiente, de dudar de uno mismo o de sentirse constantemente comparado con los demás.",
+            "estrés": "una sobrecarga física o mental, como si todo fuera demasiado al mismo tiempo y no pudiéramos parar."
+        }
+        descripcion = descripcion_emocion.get(emocion, "una emoción difícil de identificar")
+
 
         if len(posibles_emociones) > 1:
             if set(posibles_emociones) == {"ansiedad", "estrés"}:
@@ -147,10 +161,11 @@ def procesar_mensaje(mensaje, user_id):
         estado["fase"] = "emocion_confirmada"
         usuarios_estado[user_id] = estado
 
-        return (
-    f"Por lo que me contás, puede que estés sintiendo *{emocion}*, que es {descripcion}.\n"
-    "¿Te hace sentido eso? Si querés, podemos trabajarla desarrollando una habilidad que te ayude. ¿Querés empezar por ahí? (sí/no)"
-)
+                return (
+            f"Por lo que me contás, puede que estés sintiendo *{emocion}*, que es {descripcion}.\n"
+            "¿Te hace sentido eso? Si querés, podemos trabajarla desarrollando una habilidad que te ayude. ¿Querés empezar por ahí? (sí/no)"
+        )
+
 
     return "Estoy procesando lo que me compartiste. Gracias por tu paciencia."
 
