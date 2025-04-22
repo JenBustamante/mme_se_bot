@@ -166,10 +166,11 @@ def procesar_mensaje(mensaje, user_id):
             estado["fase"] = "emocion_confirmada"
             usuarios_estado[user_id] = estado
 
-        return (
-            f"Por lo que me contás, puede que estés sintiendo *{emocion}*, que es {descripcion}.\n"
-            "¿Te hace sentido eso? Si querés, podemos trabajarla desarrollando una habilidad que te ayude. ¿Querés empezar por ahí? (sí/no)"
-        )
+return (
+    f"Gracias por compartir lo que estás viviendo. Según lo que me contaste, podrías estar sintiendo lo siguiente:\n\n"
+    f"{descripcion}\n\n"
+  
+)
 
 
     return "Estoy procesando lo que me compartiste. Gracias por tu paciencia."
