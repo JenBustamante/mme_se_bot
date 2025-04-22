@@ -66,9 +66,7 @@ def procesar_mensaje(mensaje, user_id):
     if estado.get("fase") == "situacion_usuario":
         estado["situacion"] = texto
         estado["fase"] = "preguntas_emocion_1"
-        usuarios_estado[user_id] = estado
 
-        # Detección mejorada de emociones
         emociones_regex = {
             "ansiedad": r"\b(ansios[oa]|ansiedad|nervios[oa]|preocupad[oa]|inquiet[oa]|agobiad[oa]|intranquil[oa]|temeros[oa]|no paro de pensar|me cuesta respirar|me sudan las manos|alerta todo el tiempo|lat[ie] fuerte|pienso que va a pasar algo malo)\b",
             "tristeza": r"\b(trist[ea]|tristeza|deprimid[oa]|vac[ií]([o|a])|melanc[oó]lic[oa]|apagad[oa]|nostálgic[oa]|pesimista|desmotivad[oa]|sin ganas|vac[ií]o|desconectad[oa]|sin sentido|quiero llorar)\b",
@@ -86,9 +84,24 @@ def procesar_mensaje(mensaje, user_id):
 
         if emociones_detectadas:
             estado["emocion_detectada"] = ", ".join(emociones_detectadas)
+            descripcion_emocion = {
+                "ansiedad": "una emoción que suele sentirse como un nudo en el pecho, acompañada de pensamientos acelerados o preocupación constante.",
+                "tristeza": "una sensación de vacío o desánimo que puede venir acompañada de ganas de aislarse o llorar sin razón aparente.",
+                "frustración": "una emoción que aparece cuando sentimos que nuestros esfuerzos no tienen resultados, lo que genera tensión o ganas de rendirse.",
+                "enojo": "una respuesta emocional intensa ante algo que percibimos como injusto o irritante, y que a veces puede salir en forma de gritos o enojo acumulado.",
+                "soledad": "una sensación de desconexión o falta de compañía significativa, que puede doler incluso estando rodeado de gente.",
+                "inseguridad": "una percepción interna de no ser suficiente, de dudar de uno mismo o de sentirse constantemente comparado con los demás.",
+                "estrés": "una sobrecarga física o mental, como si todo fuera demasiado al mismo tiempo y no pudiéramos parar."
+            }
+            descripciones = []
+            for emocion in emociones_detectadas:
+                desc = descripcion_emocion.get(emocion)
+                if desc:
+                    descripciones.append(f"*{emocion.capitalize()}*: {desc}")
+            estado["descripcion_emocion"] = "\n".join(descripciones)
 
+        usuarios_estado[user_id] = estado
         return "Gracias por compartirlo. Me gustaría entender un poco mejor lo que sentís. ¿Qué situaciones suelen disparar esa emoción en vos?"
-
     # Primera pregunta de profundización emocional
     if estado.get("fase") == "preguntas_emocion_1":
         estado["respuesta1"] = texto
