@@ -86,8 +86,16 @@ def procesar_mensaje(mensaje, user_id):
 
         if emociones_detectadas:
             estado["emocion_detectada"] = ", ".join(emociones_detectadas)
-
-        return "Gracias por compartirlo. Me gustaría entender un poco mejor lo que sentís. ¿Qué situaciones suelen disparar esa emoción en vos?"
+            return (
+                "Gracias por contarme eso. Entiendo que estás lidiando con algo importante."
+                f" Detecté que podrías estar experimentando *{estado['emocion_detectada']}*.\n"
+                "¿Te hace sentido? Si querés, podemos seguir explorándolo para armar un plan juntos."
+            )
+        else:
+            return (
+                "Gracias por compartirlo. Todavía no tengo claro qué emoción puede estar en juego, pero lo que contás es importante."
+                " ¿Querés que lo exploremos un poco más juntos? Podés contarme qué fue lo más difícil de eso que viviste."
+            )
 
     # Primera pregunta de profundización emocional
     if estado.get("fase") == "preguntas_emocion_1":
