@@ -68,13 +68,14 @@ def procesar_mensaje(mensaje, user_id):
         estado["fase"] = "preguntas_emocion_1"
         usuarios_estado[user_id] = estado
 
+        # Detección mejorada de emociones
         emociones_regex = {
             "ansiedad": r"\b(ansios[oa]|ansiedad|nervios[oa]|preocupad[oa]|inquiet[oa]|agobiad[oa]|intranquil[oa]|temeros[oa]|no paro de pensar|me cuesta respirar|me sudan las manos|alerta todo el tiempo|lat[ie] fuerte|pienso que va a pasar algo malo)\b",
             "tristeza": r"\b(trist[ea]|tristeza|deprimid[oa]|vac[ií]([o|a])|melanc[oó]lic[oa]|apagad[oa]|nostálgic[oa]|pesimista|desmotivad[oa]|sin ganas|vac[ií]o|desconectad[oa]|sin sentido|quiero llorar)\b",
             "frustración": r"\b(frustrad[oa]|frustración|impotente|bloquead[oa]|incapaz|rendid[oa]|desbordad[oa]|me esfuerzo y no pasa nada|nunca es suficiente|todo me sale mal|no avanzo|estancado|todo se complica)\b",
             "enojo": r"\b(enoj[oa]|enojo|molest[oa]|rabia|furios[oa]|col[eé]ric[oa]|bronca|impotencia|irritad[oa]|exploto|todo me irrita|grito sin querer|mecha corta|provocan|reacciono mal)\b",
             "soledad": r"\b(sol[oa]|soledad|aislad[oa]|invisible|abandonad[oa]|desconectad[oa]|ignorado|apartad[oa]|me siento sola|me siento solo|no le importo a nadie|nadie me escribe|no tengo con quién hablar|siento que no pertenezco)\b",
-            "inseguridad": r"\b(insegur[oa]|inseguridad|no soy capaz|valgo poco|dud[oa] de m[ií]|me siento menos|me comparo|soy inferior|no soy tan buen[oa]|no sirvo para esto|no estoy a la altura|me siento incapaz|no soy suficiente|creo que no soy suficiente|me cuesta decir que no|no puedo decir que no)\b",
+            "inseguridad": r"\b(insegur[oa]|inseguridad|no soy capaz|valgo poco|dud[oa] de m[ií]|me siento menos|me comparo|soy inferior|no soy tan buen[oa]|no sirvo para esto|no estoy a la altura|me siento incapaz|siento que no hago nada bien|no soy suficiente|creo que no soy suficiente|sí[i]ndrome del impostor|me cuesta decir que no|no puedo decir que no)\b",
             "estrés": r"\b(estr[eé]s|estresad[oa]|sobrecargad[oa]|agotad[oa]|saturad[oa]|acelerad[oa]|presionad[oa]|no tengo tiempo|me duele la cabeza del cansancio|modo automático|me sobrepasa todo|mil cosas en la cabeza|no paro|estresado|estresada)\b"
         }
 
@@ -85,16 +86,8 @@ def procesar_mensaje(mensaje, user_id):
 
         if emociones_detectadas:
             estado["emocion_detectada"] = ", ".join(emociones_detectadas)
-            return (
-                "Gracias por contarme eso. Entiendo que estás lidiando con algo importante."
-                f" Detecté que podrías estar experimentando *{estado['emocion_detectada']}*.\n"
-                "¿Te hace sentido? Si querés, podemos seguir explorándolo para armar un plan juntos."
-            )
-        else:
-            return (
-                "Gracias por compartirlo. Todavía no tengo claro qué emoción puede estar en juego, pero lo que contás es importante."
-                " ¿Querés que lo exploremos un poco más juntos? Podés contarme qué fue lo más difícil de eso que viviste."
-            )
+
+        return "Gracias por compartirlo. Me gustaría entender un poco mejor lo que sentís. ¿Qué situaciones suelen disparar esa emoción en vos?"
 
     # Primera pregunta de profundización emocional
     if estado.get("fase") == "preguntas_emocion_1":
